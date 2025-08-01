@@ -1,0 +1,19 @@
+# Dossiers de dépendances et de build
+node_modules/
+dist/
+build/
+coverage/
+
+# Variables d'environnement et secrets
+.env
+.env.local
+
+# Fichiers de log et de cache
+npm-debug.log*
+yarn-error.log*
+.eslintcache
+.vscode/
+
+# Fichiers d'IDE et de système d'exploitation
+.idea/
+.DS_Store
