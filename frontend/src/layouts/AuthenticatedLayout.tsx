@@ -1,6 +1,5 @@
 import { AuthNavbar } from '../components/users/AuthNavbar';
 import { AuthFooter } from '../components/users/AuthFooter';
-// import { AuthFooter } from '../components/AuthFooter';
 
 type Props = {
   children: React.ReactNode;
