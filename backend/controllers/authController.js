@@ -84,6 +84,15 @@ exports.logout = (req, res) => {
 
 // --- NEW CONTROLLER FUNCTIONS ---
 
+exports.getAllUsers = async (req, res) => {
+    try {
+      const users = await User.find().select('-password').lean();
+      res.json(users);
+    } catch (error) {
+      res.status(500).json({ message: 'Server error' });
+    }
+  };
+
 // @desc    Get user profile by ID
 // @route   GET /auth/users/:id
 // @access  Private/Admin (or Private for self-profile)

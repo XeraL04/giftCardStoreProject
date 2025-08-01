@@ -1,14 +1,13 @@
 // src/router/index.tsx
-import { createBrowserRouter, Outlet } from 'react-router-dom';
+import { createBrowserRouter } from 'react-router-dom';
+import RootLayoutSwitcher from '../layouts/RootLayoutSwitcher';
+
 import Home from '../pages/Home';
 import Login from '../pages/Login';
 import Register from '../pages/Register';
 import GiftCardDetail from '../features/giftcards/GiftCardDetail';
+
 import Cart from '../pages/users/Cart';
-
-import { AuthRoute } from '../components/users/AuthRoute';
-
-// Components for authenticated routes
 import UserDashboard from '../pages/users/UserDashboard';
 import { DashboardProfileSection } from '../components/users/DashboardProfileSection';
 import OrdersListPage from '../pages/users/OrdersListPage';
@@ -16,86 +15,39 @@ import ProfileEditPage from '../pages/users/ProfileEditPage';
 import ShopPage from '../pages/users/ShopPage';
 import CheckoutSuccess from '../pages/users/checkout/CheckoutSuccess';
 
-// New layout switcher component
-import RootLayoutSwitcher from '../layouts/RootLayoutSwitcher';
+import { AuthRoute } from '../components/users/AuthRoute';
+import { AdminRoute } from '../components/admin/AdminRoute';
+
+import AdminUsers from '../pages/admin/AdminUsers';
+import AdminGiftCards from '../pages/admin/AdminGiftCards';
+import AdminSales from '../pages/admin/AdminSales';
+import AdminUserProfile from '../pages/admin/AdminUserProfile';
 
 export const router = createBrowserRouter([
   {
-    // This is the new, single parent route that decides the layout
     element: <RootLayoutSwitcher />,
     children: [
-      // Public-only routes
+      // Public & User-Specific Routes
       { path: '/', element: <Home /> },
       { path: '/login', element: <Login /> },
       { path: '/register', element: <Register /> },
-      
-      // The shared gift card detail page. It will now be wrapped by the correct layout.
       { path: '/giftcards/:id', element: <GiftCardDetail /> },
+      
+      // Routes for authenticated users. The AuthRoute will handle access control.
+      { path: '/dashboard', element: <AuthRoute><UserDashboard /></AuthRoute> },
+      { path: '/shop', element: <AuthRoute><ShopPage /></AuthRoute> },
+      { path: '/cart', element: <AuthRoute><Cart /></AuthRoute> },
+      { path: '/profile', element: <AuthRoute><DashboardProfileSection /></AuthRoute> },
+      { path: '/orders', element: <AuthRoute><OrdersListPage /></AuthRoute> },
+      { path: '/profile/edit', element: <AuthRoute><ProfileEditPage /></AuthRoute> },
+      { path: '/checkout/success', element: <AuthRoute><CheckoutSuccess /></AuthRoute> },
 
-      // All authenticated routes will also be wrapped by the same layout switcher
-      // But we still need the AuthRoute component for protection
-      {
-        element: <AuthRoute><Outlet /></AuthRoute>,
-        children: [
-          { path: '/dashboard', element: <UserDashboard /> },
-          { path: '/shop', element: <ShopPage /> },
-          { path: '/cart', element: <Cart /> },
-          { path: '/profile', element: <DashboardProfileSection /> },
-          { path: '/orders', element: <OrdersListPage /> },
-          { path: '/profile/edit', element: <ProfileEditPage /> },
-          { path: '/checkout/success', element: <CheckoutSuccess /> },
-        ],
-      },
+      // Admin-specific routes. The AdminRoute will handle access control.
+      { path: '/admin', element: <AdminRoute><AdminUsers /></AdminRoute> },
+      { path: '/admin/users', element: <AdminRoute><AdminUsers /></AdminRoute> },
+      { path: '/admin/giftcards', element: <AdminRoute><AdminGiftCards /></AdminRoute> },
+      { path: '/admin/sales', element: <AdminRoute><AdminSales /></AdminRoute> },
+      { path: '/admin/users/:id', element: <AdminUserProfile /> }
     ],
   },
 ]);
-
-
-
-
-
-
-
-
-// import { createBrowserRouter, Outlet } from 'react-router-dom';
-// import PublicLayout from '../layouts/PublicLayout';
-// import Home from '../pages/Home';
-// import Login from '../pages/Login';
-// import Register from '../pages/Register';
-// import GiftCardPage from '../features/giftcards/GiftCardDetail';
-
-// // users routes
-// import { AuthRoute } from '../components/users/AuthRoute';
-// import UserDashboard from '../pages/users/UserDashboard';
-// import AuthenticatedLayout from '../layouts/AuthenticatedLayout';
-// import { DashboardProfileSection } from '../components/users/DashboardProfileSection';
-// import OrdersListPage from '../pages/users/OrdersListPage';
-// import ProfileEditPage from '../pages/users/ProfileEditPage';
-// import ShopPage from '../pages/users/ShopPage';
-// import Cart from '../pages/users/Cart';
-// import CheckoutSuccess from '../pages/users/checkout/CheckoutSuccess';
-
-// export const router = createBrowserRouter([
-//   {
-//     element: <PublicLayout><Outlet /></PublicLayout>,
-//     children: [
-//       { path: '/', element: <Home /> },
-//       { path: '/login', element: <Login /> },
-//       { path: '/register', element: <Register /> },
-//       { path: '/giftcards/:id', element: <GiftCardPage /> },
-//     ],
-//   },
-//   {
-//     element: <AuthRoute><AuthenticatedLayout><Outlet /></AuthenticatedLayout></AuthRoute>,
-//     children: [
-//       { path: '/dashboard', element: <UserDashboard /> },
-//       { path: '/shop', element: <ShopPage /> },
-//       { path: '/giftcards/:id', element: <GiftCardPage /> },
-//       { path: '/cart', element: <Cart /> },
-//       { path: '/profile', element: <DashboardProfileSection /> },
-//       { path: '/orders', element: <OrdersListPage /> },
-//       { path: '/profile/edit', element: <ProfileEditPage /> },
-//       { path: '/checkout/success', element: <CheckoutSuccess /> },
-//     ],
-//   }
-// ]);

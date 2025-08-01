@@ -28,7 +28,13 @@ export default function Login() {
     try {
       const user = await loginApi(form.email, form.password);
       setUser(user);
-      navigate('/dashboard');
+
+      // Role-based redirect
+      if (user.role === 'admin') {
+        navigate('/admin');  // Redirect admins to /admin dashboard
+      } else {
+        navigate('/dashboard');  // Redirect regular users to /dashboard
+      }
     } catch (e: any) {
       setError(e.response?.data?.message || 'Login failed');
     }
@@ -66,9 +72,6 @@ export default function Login() {
           {isSubmitting ? 'Logging in...' : 'Login'}
         </button>
       </form>
-      <p className="mt-4 text-sm text-gray-600 text-center">
-        Don&apos;t have an account? <a href="/register" className="text-blue-600 hover:underline">Register</a>
-      </p>
     </div>
   );
 }

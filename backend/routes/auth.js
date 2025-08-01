@@ -1,6 +1,13 @@
 const express = require('express');
-const { register, login, getProfile, logout,
-        getUserProfileById, updateUserProfile, deleteUser
+const {
+    register,
+    login,
+    getProfile,
+    logout,
+    getUserProfileById,
+    updateUserProfile,
+    deleteUser,
+    getAllUsers
 } = require('../controllers/authController');
 const { protect } = require('../middleware/authMiddleware');
 const { admin } = require('../middleware/adminMiddleware');
@@ -12,6 +19,8 @@ router.post('/login', login);
 router.get('/me', protect, getProfile); // Get currently authenticated user's profile
 router.post('/logout', protect, logout);
 
+router.get('/users', protect, admin, getAllUsers);
+
 // New routes for user management by ID
 // GET /auth/users/:id - Get a specific user's profile by ID
 // PUT /auth/users/:id - Update a specific user's profile by ID
@@ -20,5 +29,7 @@ router.route('/users/:id')
     .get(protect, getUserProfileById)    // Protected: user can get their own, admin can get any
     .put(protect, updateUserProfile)     // Protected: user can update their own, admin can update any
     .delete(protect, admin, deleteUser); // Protected and Admin-only
+
+
 
 module.exports = router;

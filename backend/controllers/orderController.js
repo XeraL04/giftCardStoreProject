@@ -79,14 +79,19 @@ exports.getUserOrders = async (req, res) => {
 
 exports.getAllOrders = async (req, res) => {
     try {
-        // Parse query params for pagination, filtering and sorting
+        // Parse pagination and sorting parameters
         const page = parseInt(req.query.page, 10) || 1;
-        const limit = parseInt(req.query.limit, 10) || 20; // admins may want larger pages
-        const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
-        const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+        const limit = parseInt(req.query.limit, 10) || 20;
         const sortField = req.query.sort || 'purchasedAt';
         const sortOrder = req.query.order === 'asc' ? 1 : -1;
 
+        // Parse filters
+        const startDate = req.query.startDate ? new Date(req.query.startDate) : null;
+        const endDate = req.query.endDate ? new Date(req.query.endDate) : null;
+        const userId = req.query.user || null;
+        const giftCardId = req.query.giftCard || null;
+
+        // Build query filter object
         const filter = {};
 
         if (startDate || endDate) {
@@ -95,23 +100,28 @@ exports.getAllOrders = async (req, res) => {
             if (endDate) filter.purchasedAt.$lte = endDate;
         }
 
+        if (userId) filter.user = userId;
+        if (giftCardId) filter.giftCard = giftCardId;
+
+        // Get total matching orders count for pagination meta
         const totalOrders = await Order.countDocuments(filter);
 
+        // Fetch filtered and paginated orders, populate references
         const orders = await Order.find(filter)
-            .populate('giftCard')
             .populate('user', 'name email')
+            .populate('giftCard', 'brand value')
             .sort({ [sortField]: sortOrder })
             .skip((page - 1) * limit)
             .limit(limit);
 
         res.json({
+            orders,
             totalOrders,
             totalPages: Math.ceil(totalOrders / limit),
             currentPage: page,
-            orders,
         });
     } catch (error) {
-        console.error("Error fetching all orders:", error);
+        console.error('Error fetching orders:', error);
         res.status(500).json({ message: 'Server error' });
     }
 };
