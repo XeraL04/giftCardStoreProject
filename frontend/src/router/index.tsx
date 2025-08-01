@@ -14,8 +14,7 @@ import OrdersListPage from '../pages/users/OrdersListPage';
 import ProfileEditPage from '../pages/users/ProfileEditPage';
 import ShopPage from '../pages/users/ShopPage';
 import Cart from '../pages/users/Cart';
-import Cancel from '../pages/users/Cancel';
-import Success from '../pages/users/Success';
+import CheckoutSuccess from '../pages/users/checkout/CheckoutSuccess';
 
 export const router = createBrowserRouter([
   {
@@ -36,8 +35,7 @@ export const router = createBrowserRouter([
       { path: '/profile', element: <DashboardProfileSection /> },
       { path: '/orders', element: <OrdersListPage /> },
       { path: '/profile/edit', element: <ProfileEditPage /> },
-      { path: '/success', element: <Success />},
-      { path: '/cancel', element: <Cancel />},
+      { path: '/checkout/success', element: <CheckoutSuccess /> },
     ],
   }
 ]);

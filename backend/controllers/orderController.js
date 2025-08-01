@@ -115,3 +115,45 @@ exports.getAllOrders = async (req, res) => {
         res.status(500).json({ message: 'Server error' });
     }
 };
+
+// Simulated checkout — creates orders, decrements stock, returns success
+
+exports.simulateCheckout = async (req, res) => {
+    const { items } = req.body; // [{ giftCardId, quantity }, ...]
+    try {
+        if (!items || !Array.isArray(items) || items.length === 0) {
+            return res.status(400).json({ message: 'Cart is empty' });
+        }
+        const createdOrders = [];
+        for (const item of items) {
+            const giftCard = await GiftCard.findById(item.giftCardId);
+            if (!giftCard) {
+                return res.status(404).json({ message: `Gift card not found (id: ${item.giftCardId})` });
+            }
+            if (giftCard.stock < item.quantity) {
+                return res.status(400).json({ message: `Insufficient stock for ${giftCard.brand}` });
+            }
+            // Decrement stock
+            giftCard.stock -= item.quantity;
+            await giftCard.save();
+            // Create order
+            const order = new Order({
+                user: req.user._id,
+                giftCard: giftCard._id,
+                quantity: item.quantity,
+                totalPrice: giftCard.price * item.quantity,
+                status: 'completed', // or 'simulated'
+                purchasedAt: new Date(),
+            });
+            await order.save();
+            createdOrders.push(order);
+        }
+        res.json({
+            message: 'Simulated payment successful, orders created!',
+            orders: createdOrders,
+        });
+    } catch (err) {
+        console.error('Simulated checkout error:', err);
+        res.status(500).json({ message: 'Server error' });
+    }
+};

@@ -1,19 +1,40 @@
 import { useCartStore } from '../../app/store';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
+import api from '../../api/client';
 
 export default function Cart() {
   const items = useCartStore(state => state.items);
   const removeFromCart = useCartStore(state => state.removeFromCart);
   const updateQuantity = useCartStore(state => state.updateQuantity);
   const clearCart = useCartStore(state => state.clearCart);
-  const navigate = useNavigate();
 
+  const [loading, setLoading] = useState(false);
   const [updatingItemIds, setUpdatingItemIds] = useState<string[]>([]);
+
+  const navigate = useNavigate();
 
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const [loading, setLoading] = useState(false);
+  const handleSimulateCheckout = async () => {
+    if (items.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+    setLoading(true);
+    try {
+      const response = await api.post('/orders/simulate-checkout', {
+        items: items.map(({ giftCardId, quantity }) => ({ giftCardId, quantity })),
+      });
+      clearCart(); // clear cart on successful order simulation
+      navigate('/checkout/success', { state: { orders: response.data.orders } });
+    } catch (error: any) {
+      alert(error.response?.data?.message || 'Simulated checkout failed');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const handleQuantityChange = (giftCardId: string, qty: number) => {
     if (qty < 1) return;
@@ -96,9 +117,10 @@ export default function Cart() {
         </button>
         <button
           disabled={loading}
+          onClick={handleSimulateCheckout}
           className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition disabled:opacity-50"
         >
-          Proceed to Checkout
+          {loading ? 'Processing...' : 'Proceed to Checkout'}
         </button>
       </div>
     </main>
