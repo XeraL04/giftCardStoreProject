@@ -1,7 +1,7 @@
-// src/components/admin/AddGiftCardModal.tsx
 import { useState } from 'react';
 import type { GiftCard } from '../../pages/admin/AdminGiftCards';
 import api from '../../api/client';
+import { PlusCircleIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
 interface AddGiftCardModalProps {
   isOpen: boolean;
@@ -46,7 +46,7 @@ export default function AddGiftCardModal({ isOpen, onClose, onAdded }: AddGiftCa
       };
       const res = await api.post<GiftCard>('/giftcards', payload);
       onAdded(res.data);
-      // Clear form
+      // Reset
       setBrand('');
       setValue('');
       setPrice('');
@@ -62,76 +62,109 @@ export default function AddGiftCardModal({ isOpen, onClose, onAdded }: AddGiftCa
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
+      className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 px-4"
       onClick={onClose}
       aria-labelledby="add-gift-card-title"
       role="dialog"
       aria-modal="true"
     >
       <div
-        className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md"
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside modal
+        className="bg-white/90 backdrop-blur-md w-full max-w-lg rounded-3xl shadow-2xl border border-blue-100 p-6 animate-fadeIn"
+        onClick={(e) => e.stopPropagation()}
       >
-        <h2 id="add-gift-card-title" className="text-xl font-semibold mb-4">
-          Add New Gift Card
-        </h2>
-
-        {error && <div className="bg-red-100 text-red-700 p-2 mb-4 rounded">{error}</div>}
-
-        <div className="flex flex-col space-y-3">
-          <input
-            type="text"
-            placeholder="Brand *"
-            value={brand}
-            onChange={(e) => setBrand(e.target.value)}
-            className="border rounded px-3 py-2"
-          />
-          <input
-            type="number"
-            placeholder="Value *"
-            value={value}
-            onChange={(e) => setValue(e.target.value === '' ? '' : Number(e.target.value))}
-            min={1}
-            className="border rounded px-3 py-2"
-          />
-          <input
-            type="number"
-            placeholder="Price *"
-            value={price}
-            onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
-            min={0}
-            step={0.01}
-            className="border rounded px-3 py-2"
-          />
-          <input
-            type="number"
-            placeholder="Stock *"
-            value={stock}
-            onChange={(e) => setStock(e.target.value === '' ? '' : Number(e.target.value))}
-            min={0}
-            className="border rounded px-3 py-2"
-          />
-          <input
-            type="text"
-            placeholder="Image URL"
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            className="border rounded px-3 py-2"
-          />
+        {/* Header */}
+        <div className="flex justify-between items-center border-b border-blue-50 pb-4 mb-6">
+          <h2 id="add-gift-card-title" className="text-2xl font-extrabold text-slate-900 flex items-center gap-2">
+            <PlusCircleIcon className="w-6 h-6 text-green-500" />
+            Add New Gift Card
+          </h2>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-red-500 transition"
+            aria-label="Close modal"
+          >
+            <XMarkIcon className="w-6 h-6" />
+          </button>
         </div>
 
-        <div className="mt-6 flex justify-end space-x-3">
+        {/* Error */}
+        {error && (
+          <div className="mb-4 p-3 rounded-lg bg-red-100 text-red-700 text-sm font-medium">
+            {error}
+          </div>
+        )}
+
+        {/* Form */}
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Brand *</label>
+            <input
+              type="text"
+              value={brand}
+              onChange={(e) => setBrand(e.target.value)}
+              className="w-full px-4 py-2 rounded-full border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="e.g. Amazon"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Value *</label>
+            <input
+              type="number"
+              value={value}
+              onChange={(e) => setValue(e.target.value === '' ? '' : Number(e.target.value))}
+              min={1}
+              className="w-full px-4 py-2 rounded-full border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="e.g. 50"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Price *</label>
+            <input
+              type="number"
+              value={price}
+              onChange={(e) => setPrice(e.target.value === '' ? '' : Number(e.target.value))}
+              min={0}
+              step={0.01}
+              className="w-full px-4 py-2 rounded-full border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="e.g. 45"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Stock *</label>
+            <input
+              type="number"
+              value={stock}
+              onChange={(e) => setStock(e.target.value === '' ? '' : Number(e.target.value))}
+              min={0}
+              className="w-full px-4 py-2 rounded-full border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="e.g. 100"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-semibold text-slate-700 mb-1">Image URL</label>
+            <input
+              type="text"
+              value={imageUrl}
+              onChange={(e) => setImageUrl(e.target.value)}
+              className="w-full px-4 py-2 rounded-full border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              placeholder="https://..."
+            />
+          </div>
+        </div>
+
+        {/* Actions */}
+        <div className="mt-8 flex justify-end gap-3">
           <button
             onClick={onClose}
             disabled={loading}
-            className="px-4 py-2 rounded border border-gray-300 hover:bg-gray-100 transition"
+            className="px-5 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition disabled:opacity-50"
           >
             Cancel
           </button>
           <button
             onClick={handleSubmit}
             disabled={loading}
-            className="px-4 py-2 rounded bg-green-600 text-white hover:bg-green-700 transition"
+            className="px-5 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow hover:shadow-lg hover:from-green-600 hover:to-emerald-600 transition disabled:opacity-50"
           >
             {loading ? 'Adding...' : 'Add Gift Card'}
           </button>

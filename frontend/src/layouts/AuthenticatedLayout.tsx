@@ -9,7 +9,7 @@ export default function AuthenticatedLayout({ children }: Props) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
       <AuthNavbar />
-      <main className="flex-1 container mx-auto px-4">{children}</main>
+      <main className="flex-1 container mx-auto px-4 pt-32">{children}</main>
       <AuthFooter />
     </div>
   );

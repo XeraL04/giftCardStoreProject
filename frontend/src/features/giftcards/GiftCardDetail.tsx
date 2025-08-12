@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api/client';
-import { useEffect } from 'react';
 import { useCartStore } from '../../app/store';
 import type { GiftCard } from '../../types/GiftCards';
+import { ArrowLeftIcon } from '@heroicons/react/24/solid';
 
 export default function GiftCardDetail() {
   const { id } = useParams<{ id: string }>();
@@ -24,7 +24,9 @@ export default function GiftCardDetail() {
       .then(res => setGiftCard(res.data))
       .catch(err =>
         setError(
-          err.response?.data?.message || err.message || 'Could not load gift card details.'
+          err.response?.data?.message ||
+            err.message ||
+            'Could not load gift card details.'
         )
       )
       .finally(() => setLoading(false));
@@ -35,7 +37,6 @@ export default function GiftCardDetail() {
       alert('Invalid quantity or out of stock');
       return;
     }
-
     addToCart({
       giftCardId: giftCard._id,
       brand: giftCard.brand,
@@ -44,57 +45,95 @@ export default function GiftCardDetail() {
       imageUrl: giftCard.imageUrl,
     });
 
-    alert(`Added ${quantity} ${giftCard.brand} gift card(s) to cart`);
-    navigate('/cart'); // Optional: navigate to Cart page after adding
+    navigate('/cart');
   };
 
-  if (loading) return <div className="py-10 text-center">Loading...</div>;
-  if (error)
+  // Skeleton Loader
+  if (loading) {
     return (
-      <div className="py-10 text-center text-red-500">
-        {error}
+      <div className="max-w-3xl mx-auto p-10">
+        <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-6"></div>
+        <div className="h-80 bg-gray-200 rounded-3xl animate-pulse"></div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="py-16 text-center">
+        <p className="text-red-500 font-semibold">{error}</p>
         <button
           onClick={() => navigate(-1)}
-          className="ml-4 underline text-blue-500"
+          className="mt-6 inline-flex items-center gap-2 text-blue-600 hover:text-fuchsia-600 transition"
         >
-          Back
+          <ArrowLeftIcon className="w-5 h-5" /> Back
         </button>
       </div>
     );
+  }
 
-  if (!giftCard) return <div className="py-10 text-center">Gift card not found.</div>;
+  if (!giftCard) {
+    return (
+      <div className="py-16 text-center text-gray-500">Gift card not found.</div>
+    );
+  }
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded shadow-lg p-8 my-10">
+    <div className="max-w-5xl mx-auto px-6 py-16">
+      {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
-        className="mb-6 text-sm underline text-blue-500"
+        className="mb-8 inline-flex items-center gap-2 text-blue-600 hover:text-fuchsia-600 transition font-medium"
       >
-        &larr; Back
+        <ArrowLeftIcon className="w-5 h-5" /> Back
       </button>
-      <div className="flex flex-col sm:flex-row items-center gap-6">
-        <img
-          src={giftCard.imageUrl}
-          alt={giftCard.brand}
-          className="h-40 w-40 object-contain bg-gray-100 rounded"
-        />
-        <div className="flex-1">
-          <h1 className="text-2xl font-bold mb-2">{giftCard.brand} Gift Card</h1>
-          <div className="text-lg mb-2">
-            <span className="font-semibold">Value:</span> ${giftCard.value}
-          </div>
-          <div className="text-lg mb-2">
-            <span className="font-semibold">Price:</span>{' '}
-            <span className="text-green-600">${giftCard.price}</span>
-          </div>
-          <div className="mb-4 text-gray-500">
-            <span className="font-semibold">Stock:</span>{' '}
-            {giftCard.stock > 0 ? giftCard.stock : <span className="text-red-500">Out of stock</span>}
+
+      <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-50 overflow-hidden flex flex-col md:flex-row gap-10 p-8">
+        {/* Image */}
+        <div className="flex-1 flex items-center justify-center">
+          <img
+            src={giftCard.imageUrl}
+            alt={giftCard.brand}
+            className="h-56 w-56 object-contain bg-gray-100 p-4 rounded-2xl shadow-md ring-2 ring-blue-100"
+          />
+        </div>
+
+        {/* Details */}
+        <div className="flex-1 flex flex-col">
+          <h1 className="text-3xl font-extrabold text-slate-900 mb-2">
+            {giftCard.brand} Gift Card
+          </h1>
+          <p className="text-gray-500 mb-4">
+            Perfect gift for family, friends, or yourself. Instant delivery and secure checkout.
+          </p>
+
+          <div className="flex items-center gap-6 mb-4">
+            <div>
+              <span className="block text-sm text-gray-500">Value</span>
+              <span className="text-lg font-semibold">${giftCard.value}</span>
+            </div>
+            <div>
+              <span className="block text-sm text-gray-500">Price</span>
+              <span className="text-lg font-semibold text-green-600">${giftCard.price}</span>
+            </div>
           </div>
 
+          <div className="mb-6">
+            {giftCard.stock > 0 ? (
+              <span className="inline-block px-3 py-1 text-sm rounded-full bg-green-100 text-green-700 font-medium">
+                In Stock ({giftCard.stock})
+              </span>
+            ) : (
+              <span className="inline-block px-3 py-1 text-sm rounded-full bg-red-100 text-red-700 font-medium">
+                Out of Stock
+              </span>
+            )}
+          </div>
+
+          {/* Quantity Selector */}
           {giftCard.stock > 0 && (
-            <div className="flex items-center gap-3 mb-4">
-              <label htmlFor="quantity" className="font-semibold">
+            <div className="flex items-center gap-4 mb-6">
+              <label htmlFor="quantity" className="font-semibold text-slate-700">
                 Quantity:
               </label>
               <input
@@ -110,19 +149,20 @@ export default function GiftCardDetail() {
                   if (val < 1) val = 1;
                   setQuantity(val);
                 }}
-                className="border rounded w-20 px-2 py-1"
+                className="border border-blue-200 rounded-lg w-20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           )}
 
+          {/* Action Button */}
           <button
             disabled={giftCard.stock < 1}
-            className={`px-6 py-2 text-white rounded font-semibold transition ${
-              giftCard.stock < 1
-                ? 'bg-gray-400 cursor-not-allowed'
-                : 'bg-blue-600 hover:bg-blue-700'
-            }`}
             onClick={handleAddToCart}
+            className={`w-full py-3 rounded-full font-semibold transition-all shadow-md ${
+              giftCard.stock < 1
+                ? 'bg-gray-300 cursor-not-allowed text-white'
+                : 'bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white hover:shadow-lg hover:from-blue-600 hover:to-fuchsia-600'
+            }`}
           >
             {giftCard.stock < 1 ? 'Out of Stock' : 'Add to Cart'}
           </button>

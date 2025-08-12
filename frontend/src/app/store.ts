@@ -6,6 +6,7 @@ type User = {
   email: string;
   phoneNumber?: string;
   role: string;
+  avatarUrl?: string;
   token: string
 };
 

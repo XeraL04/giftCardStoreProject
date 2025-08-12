@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../../api/client';
+import { ArrowLeftIcon, UserCircleIcon, PencilSquareIcon } from '@heroicons/react/24/solid';
 
 type User = {
   _id: string;
@@ -16,8 +17,9 @@ export default function AdminUserProfile() {
 
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [editing, setEditing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   // Form state
   const [name, setName] = useState('');
@@ -47,6 +49,7 @@ export default function AdminUserProfile() {
     if (!id) return;
     setLoading(true);
     setError(null);
+    setSuccess(null);
     try {
       const res = await api.put<User>(`/auth/users/${id}`, {
         name,
@@ -56,7 +59,7 @@ export default function AdminUserProfile() {
       });
       setUser(res.data);
       setEditing(false);
-      alert('User updated successfully');
+      setSuccess('User updated successfully');
     } catch (error: any) {
       setError(error.response?.data?.message || 'Update failed');
     } finally {
@@ -64,69 +67,88 @@ export default function AdminUserProfile() {
     }
   };
 
-  if (loading) return <div className="p-6 text-center">Loading user details...</div>;
-  if (error) return <div className="p-6 text-center text-red-600">Error: {error}</div>;
-  if (!user) return <div className="p-6 text-center">User not found.</div>;
+  if (loading) return <div className="p-8 text-center text-gray-600">Loading user details...</div>;
+  if (error && !user) return <div className="p-8 text-center text-red-600">Error: {error}</div>;
+  if (!user) return <div className="p-8 text-center text-gray-500">User not found.</div>;
 
   return (
-    <main className="max-w-xl mx-auto p-6 bg-white rounded shadow">
-      <h1 className="text-2xl font-bold mb-6">User Profile</h1>
-
+    <main className="max-w-3xl mx-auto my-10 p-8 bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl">
+      {/* Back button */}
       <button
         onClick={() => navigate(-1)}
-        className="mb-4 text-blue-600 underline hover:text-blue-800"
+        className="flex items-center gap-2 text-blue-600 hover:text-fuchsia-500 font-medium mb-6"
       >
-        &larr; Back to Users List
+        <ArrowLeftIcon className="w-5 h-5" /> Back to Users
       </button>
 
-      <div className="space-y-4">
+      {/* Header */}
+      <div className="flex items-center gap-4 mb-8">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 flex items-center justify-center text-white shadow-lg">
+          <UserCircleIcon className="w-10 h-10" />
+        </div>
         <div>
-          <label className="block mb-1 font-semibold">Name</label>
+          <h1 className="text-3xl font-extrabold text-slate-900">User Profile</h1>
+          <p className="text-gray-500 text-sm">Manage user details and role</p>
+        </div>
+      </div>
+
+      {/* Alerts */}
+      {error && <p className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</p>}
+      {success && <p className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</p>}
+
+      {/* Profile form */}
+      <div className="space-y-5">
+        {/* Name */}
+        <div>
+          <label className="block mb-1 font-semibold text-slate-700">Name</label>
           {editing ? (
             <input
               type="text"
-              className="w-full border rounded px-3 py-2"
+              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
               value={name}
               onChange={e => setName(e.target.value)}
             />
           ) : (
-            <p>{user.name}</p>
+            <p className="text-gray-800">{user.name}</p>
           )}
         </div>
 
+        {/* Email */}
         <div>
-          <label className="block mb-1 font-semibold">Email</label>
+          <label className="block mb-1 font-semibold text-slate-700">Email</label>
           {editing ? (
             <input
               type="email"
-              className="w-full border rounded px-3 py-2"
+              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
           ) : (
-            <p>{user.email}</p>
+            <p className="text-gray-800">{user.email}</p>
           )}
         </div>
 
+        {/* Phone */}
         <div>
-          <label className="block mb-1 font-semibold">Phone Number</label>
+          <label className="block mb-1 font-semibold text-slate-700">Phone Number</label>
           {editing ? (
             <input
               type="tel"
-              className="w-full border rounded px-3 py-2"
+              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
               value={phoneNumber}
               onChange={e => setPhoneNumber(e.target.value)}
             />
           ) : (
-            <p>{user.phoneNumber || '-'}</p>
+            <p className="text-gray-800">{user.phoneNumber || '-'}</p>
           )}
         </div>
 
+        {/* Role */}
         <div>
-          <label className="block mb-1 font-semibold">Role</label>
+          <label className="block mb-1 font-semibold text-slate-700">Role</label>
           {editing ? (
             <select
-              className="w-full border rounded px-3 py-2"
+              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
               value={role}
               onChange={e => setRole(e.target.value)}
             >
@@ -134,23 +156,26 @@ export default function AdminUserProfile() {
               <option value="admin">Admin</option>
             </select>
           ) : (
-            <p className="capitalize">{user.role}</p>
+            <span className={`px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+              {user.role}
+            </span>
           )}
         </div>
       </div>
 
-      <div className="mt-6 flex gap-4">
+      {/* Actions */}
+      <div className="mt-8 flex gap-4">
         {editing ? (
           <>
             <button
               onClick={handleSave}
-              className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700 transition"
+              className="px-6 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow hover:shadow-lg hover:from-green-600 hover:to-emerald-600 transition"
             >
               Save Changes
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="bg-gray-300 px-4 py-2 rounded hover:bg-gray-400 transition"
+              className="px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
             >
               Cancel
             </button>
@@ -158,8 +183,9 @@ export default function AdminUserProfile() {
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition"
+            className="flex items-center gap-2 px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white font-semibold shadow hover:shadow-lg hover:from-blue-600 hover:to-fuchsia-600 transition"
           >
+            <PencilSquareIcon className="w-4 h-4" />
             Edit Profile
           </button>
         )}

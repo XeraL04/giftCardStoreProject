@@ -2,16 +2,18 @@ import { useAuthStore } from '../../app/store';
 import { useEffect, useState, useRef } from 'react';
 import api from '../../api/client';
 import { useNavigate } from 'react-router-dom';
+import { UserCircleIcon, ClipboardDocumentListIcon, StarIcon } from '@heroicons/react/24/solid';
 
 export function DashboardProfileSection() {
   const { user } = useAuthStore();
   const [orderCount, setOrderCount] = useState(0);
 
-  const [testimonialRating, setTestimonialRating] = useState(5);
+  const [testimonialRating, setTestimonialRating] = useState(0);
   const [testimonialComment, setTestimonialComment] = useState('');
   const [testimonialSubmitted, setTestimonialSubmitted] = useState(false);
   const [loadingTestimonial, setLoadingTestimonial] = useState(false);
   const [testimonialError, setTestimonialError] = useState<string | null>(null);
+  // const [rating, setRating] = useState(0);
 
   const navigate = useNavigate();
   const commentRef = useRef<HTMLTextAreaElement | null>(null);
@@ -22,7 +24,6 @@ export function DashboardProfileSection() {
       .catch(() => setOrderCount(0));
   }, []);
 
-  // Validation checks
   const isCommentValid = testimonialComment.trim().length >= 10;
   const isFormValid = isCommentValid && testimonialRating >= 1 && testimonialRating <= 5;
 
@@ -39,7 +40,6 @@ export function DashboardProfileSection() {
       setTestimonialSubmitted(true);
       setTestimonialComment('');
       setTestimonialRating(5);
-      // Optionally return focus to comment field
       commentRef.current?.focus();
     } catch (error: any) {
       setTestimonialError(error.response?.data?.message || 'Failed to submit testimonial');
@@ -49,50 +49,68 @@ export function DashboardProfileSection() {
   };
 
   return (
-    <section className="max-w-2xl mx-auto bg-white rounded-lg shadow mt-12 mb-16 overflow-hidden">
-      {/* Section 1: Welcome / Info */}
-      <div className="bg-gradient-to-r from-blue-600 to-indigo-500 px-8 py-8 text-white text-center">
-        <h2 className="text-3xl font-bold mb-2">Welcome back, {user?.name || 'Friend'}!</h2>
-        <p className="text-lg opacity-90">
-          This is your profile area. Here, you can review your orders, update your info, and share your experience with us!
-        </p>
+    <section className="max-w-5xl mx-auto my-16 bg-white/80 backdrop-blur-md border border-blue-50 rounded-3xl shadow-xl overflow-hidden">
+
+      {/* Gradient Header */}
+      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-fuchsia-600 px-8 py-10 text-white text-center">
+        <div className="flex flex-col items-center">
+          <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center shadow-lg ring-2 ring-white/30 mb-4">
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt={user.name || 'User'}
+                className="w-full h-full rounded-full object-cover"
+              />
+            ) : (
+              <UserCircleIcon className="w-14 h-14 text-white/90" />
+            )}
+          </div>
+          <h2 className="text-3xl font-extrabold mb-2">Welcome back, {user?.name || 'Friend'}!</h2>
+          <p className="text-lg text-blue-100 max-w-2xl">
+            This is your profile hub. Review orders, update your info, and share your experience!
+          </p>
+        </div>
       </div>
 
-      {/* Sections 2 & 3: Cards side-by-side */}
+      {/* Action Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-8 py-10">
         <div
-          className="bg-blue-50 rounded-lg p-6 flex flex-col items-center shadow hover:shadow-lg cursor-pointer transition"
           onClick={() => navigate('/orders')}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter') navigate('/orders'); }}
           aria-label="My Orders"
+          className="group bg-white/80 backdrop-blur-sm border border-blue-50 rounded-2xl p-6 flex flex-col items-center shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer focus:ring-2 focus:ring-blue-400"
         >
-          <span className="text-blue-600 text-4xl mb-2">📦</span>
-          <div className="font-bold text-xl mb-1">My Orders</div>
-          <div className="text-gray-500 mb-2 text-lg">{orderCount} order{orderCount === 1 ? '' : 's'}</div>
-          <div className="text-blue-700 text-sm">View all your purchased gift cards</div>
+          <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-fuchsia-500 group-hover:text-white transition">
+            <ClipboardDocumentListIcon className="w-8 h-8" />
+          </div>
+          <h3 className="font-bold text-xl mb-1 text-slate-900">My Orders</h3>
+          <p className="text-gray-500 mb-2 text-lg">{orderCount} order{orderCount === 1 ? '' : 's'}</p>
+          <span className="text-blue-700 text-sm">View all your purchased gift cards</span>
         </div>
 
         <div
-          className="bg-green-50 rounded-lg p-6 flex flex-col items-center shadow hover:shadow-lg cursor-pointer transition"
           onClick={() => navigate('/profile/edit')}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => { if (e.key === 'Enter') navigate('/profile/edit'); }}
           aria-label="Edit Profile"
+          className="group bg-white/80 backdrop-blur-sm border border-green-50 rounded-2xl p-6 flex flex-col items-center shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer focus:ring-2 focus:ring-green-400"
         >
-          <span className="text-green-600 text-4xl mb-2">👤</span>
-          <div className="font-bold text-xl mb-1">Edit Profile</div>
-          <div className="text-gray-500 mb-2 text-lg">Update your info</div>
-          <div className="text-green-700 text-sm">Change your name, email, phone number and password</div>
+          <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-3 group-hover:bg-gradient-to-br group-hover:from-green-500 group-hover:to-blue-500 group-hover:text-white transition">
+            <UserCircleIcon className="w-8 h-8" />
+          </div>
+          <h3 className="font-bold text-xl mb-1 text-slate-900">Edit Profile</h3>
+          <p className="text-gray-500 mb-2 text-lg">Update your info</p>
+          <span className="text-green-700 text-sm">Change your name, email, phone and password</span>
         </div>
       </div>
 
-      {/* Section 4: Share Your Experience Form (full width below cards) */}
-      <div className="bg-yellow-50 rounded-lg p-6 mb-8 shadow max-w-lg mx-auto">
+      {/* Testimonial Form */}
+      <div className="bg-white/90 backdrop-blur-sm border border-yellow-100 rounded-2xl mx-8 mb-10 p-6 shadow-lg max-w-">
         <h3 className="font-bold text-xl mb-4 text-center text-yellow-700 flex items-center justify-center gap-2">
-          <span className="text-4xl">⭐</span> Share Your Experience
+          <span className="text-3xl">⭐</span> Share Your Experience
         </h3>
 
         {testimonialSubmitted ? (
@@ -100,27 +118,30 @@ export function DashboardProfileSection() {
             Thank you for your testimonial!
           </p>
         ) : (
-          <form onSubmit={handleSubmitTestimonial} className="flex flex-col gap-4">
+          <form onSubmit={handleSubmitTestimonial} className="flex flex-col gap-5">
+            {/* Rating Stars */}
             <label htmlFor="rating" className="flex flex-col gap-1">
-              <span className="font-semibold">Rating</span>
-              <select
-                id="rating"
-                value={testimonialRating}
-                onChange={(e) => setTestimonialRating(Number(e.target.value))}
-                required
-                className="p-2 rounded border focus:outline-none focus:ring-2 focus:ring-yellow-400"
-                aria-invalid={!isFormValid}
-                aria-describedby="rating-desc"
-              >
-                {[5, 4, 3, 2, 1].map(r => (
-                  <option key={r} value={r}>{r} {r === 1 ? 'star' : 'stars'}</option>
+              <span className="font-semibold text-slate-700">Rating</span>
+              <div className="flex gap-1">
+                {[1, 2, 3, 4, 5].map((star) => (
+                  <button
+                    key={star}
+                    type="button"
+                    onClick={() => setTestimonialRating(star)}
+                    className="focus:outline-none"
+                    aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
+                  >
+                    <StarIcon
+                      className={`w-8 h-8 transition-colors ${star <= testimonialRating ? 'text-yellow-400' : 'text-gray-300'
+                        }`}
+                    />
+                  </button>
                 ))}
-              </select>
-              <small className="text-gray-600" id="rating-desc">Select a rating from 1 to 5 stars</small>
+              </div>
             </label>
 
             <label htmlFor="comment" className="flex flex-col gap-1">
-              <span className="font-semibold">Comment</span>
+              <span className="font-semibold text-slate-700">Comment</span>
               <textarea
                 id="comment"
                 ref={commentRef}
@@ -130,14 +151,11 @@ export function DashboardProfileSection() {
                 required
                 disabled={loadingTestimonial}
                 placeholder="Tell us about your experience (at least 10 characters)…"
-                className={`p-2 rounded border resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${
-                  !isCommentValid && testimonialComment.length > 0 ? 'border-red-500' : ''
-                }`}
-                aria-invalid={!isCommentValid}
-                aria-describedby="comment-error"
+                className={`p-3 rounded-xl border resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${!isCommentValid && testimonialComment.length > 0 ? 'border-red-500' : 'border-yellow-200'
+                  }`}
               />
               {!isCommentValid && testimonialComment.length > 0 && (
-                <small id="comment-error" className="text-red-600">Please enter at least 10 characters.</small>
+                <small className="text-red-600">Please enter at least 10 characters.</small>
               )}
             </label>
 
@@ -148,35 +166,9 @@ export function DashboardProfileSection() {
             <button
               type="submit"
               disabled={!isFormValid || loadingTestimonial}
-              className={`bg-yellow-400 text-white py-2 rounded font-semibold hover:bg-yellow-500 transition disabled:opacity-60`}
-              aria-busy={loadingTestimonial}
+              className="w-full py-3 bg-gradient-to-r from-yellow-400 to-orange-400 text-white font-semibold rounded-full shadow-md hover:shadow-lg hover:from-yellow-500 hover:to-orange-500 transition-all disabled:opacity-60"
             >
-              {loadingTestimonial ? (
-                <span className="flex justify-center items-center gap-2">
-                  <svg
-                    className="animate-spin h-5 w-5 text-white"
-                    xmlns="http://www.w3.org/2000/svg"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    aria-hidden="true"
-                  >
-                    <circle
-                      className="opacity-25"
-                      cx="12"
-                      cy="12"
-                      r="10"
-                      stroke="currentColor"
-                      strokeWidth="4"
-                    />
-                    <path
-                      className="opacity-75"
-                      fill="currentColor"
-                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
-                    />
-                  </svg>
-                  Submitting...
-                </span>
-              ) : ('Submit Testimonial')}
+              {loadingTestimonial ? 'Submitting...' : 'Submit Testimonial'}
             </button>
           </form>
         )}

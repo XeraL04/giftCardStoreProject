@@ -1,18 +1,17 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
 import { useNavigate } from 'react-router-dom';
+import { ClipboardDocumentIcon, XMarkIcon } from '@heroicons/react/24/solid';
 
-// Updated type definition to explicitly allow `giftCard` to be null
-// if it fails to populate or the referenced GiftCard is missing.
 type Order = {
   _id: string;
-  giftCard: { // This now represents a _populated_ gift card object
+  giftCard: {
     _id: string;
     brand: string;
     value: number;
-    imageUrl?: string; // Still optional within the populated object
+    imageUrl?: string;
     price: number;
-  } | null; // <-- Crucial: giftCard itself can be null if not found/populated
+  } | null;
   quantity: number;
   totalPrice: number;
   purchasedAt: string;
@@ -20,7 +19,6 @@ type Order = {
   code?: string;
 };
 
-// Props for the detail modal
 type OrderDetailModalProps = {
   order: Order | null;
   onClose: () => void;
@@ -31,32 +29,31 @@ function OrderDetailModal({ order, onClose }: OrderDetailModalProps) {
 
   return (
     <div
-      className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
+      className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 px-4"
       onClick={onClose}
-      aria-modal="true" role="dialog"
-      tabIndex={-1}
+      role="dialog"
+      aria-modal="true"
     >
       <div
-        className="bg-white rounded p-6 max-w-md w-full shadow-lg relative"
-        onClick={(e) => e.stopPropagation()} // prevent closing when clicking modal content
+        className="bg-white/90 backdrop-blur-md rounded-3xl shadow-2xl p-6 max-w-md w-full relative border border-blue-100"
+        onClick={(e) => e.stopPropagation()}
       >
         <button
-          className="absolute top-2 right-2 text-gray-600 hover:text-gray-900"
+          className="absolute top-3 right-3 p-1 rounded-full hover:bg-gray-100 transition"
           onClick={onClose}
           aria-label="Close modal"
         >
-          ✕
+          <XMarkIcon className="w-5 h-5 text-gray-500" />
         </button>
-        <h2 className="text-2xl font-bold mb-4">Order Details</h2>
+        <h2 className="text-2xl font-extrabold mb-4 text-slate-900">Order Details</h2>
 
-        {/* --- FIX FOR OrderDetailModal --- */}
-        {order.giftCard ? ( // Check if giftCard is not null
+        {order.giftCard ? (
           <>
-            {order.giftCard.imageUrl && ( // Check if imageUrl exists before rendering img tag
+            {order.giftCard.imageUrl && (
               <img
                 src={order.giftCard.imageUrl}
                 alt={order.giftCard.brand}
-                className="w-32 h-32 object-contain mb-4"
+                className="w-28 h-28 object-contain mx-auto mb-4 rounded-xl bg-gray-100 p-2"
               />
             )}
             <p><strong>Brand:</strong> {order.giftCard.brand}</p>
@@ -66,15 +63,30 @@ function OrderDetailModal({ order, onClose }: OrderDetailModalProps) {
         ) : (
           <p className="text-gray-500 mb-4">Gift Card details not available.</p>
         )}
-        {/* --- END FIX --- */}
 
         <p><strong>Quantity:</strong> {order.quantity}</p>
         <p><strong>Total Price:</strong> ${order.totalPrice}</p>
-        <p><strong>Status:</strong> {order.status.charAt(0).toUpperCase() + order.status.slice(1)}</p>
-        <p><strong>Purchased At:</strong> {order.purchasedAt ? new Date(order.purchasedAt).toLocaleString() : 'N/A'}</p>
+        <p>
+          <strong>Status:</strong>{" "}
+          <span className={`px-2 py-0.5 rounded-full text-xs font-semibold
+            ${order.status === 'completed' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+          </span>
+        </p>
+        <p><strong>Purchased At:</strong> {new Date(order.purchasedAt).toLocaleString()}</p>
+
         {order.code && (
-          <p className="mt-2">
-            <strong>Code:</strong> <span className="font-mono bg-gray-100 px-2 py-1 rounded">{order.code}</span>
+          <p className="mt-3 flex items-center gap-3">
+            <span className="font-mono bg-gray-100 px-3 py-1 rounded select-all">{order.code}</span>
+            <button
+              onClick={() => {
+                navigator.clipboard.writeText(order.code || '');
+                alert('Gift card code copied to clipboard!');
+              }}
+              className="text-blue-600 hover:text-fuchsia-500 transition"
+            >
+              <ClipboardDocumentIcon className="w-5 h-5" />
+            </button>
           </p>
         )}
       </div>
@@ -91,20 +103,16 @@ export default function OrdersListPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
-
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
   const [sortField, setSortField] = useState('purchasedAt');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-
   const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams();
-
     params.append('page', currentPage.toString());
     params.append('limit', ITEMS_PER_PAGE.toString());
     if (startDate) params.append('startDate', startDate);
@@ -113,13 +121,8 @@ export default function OrdersListPage() {
     if (sortOrder) params.append('order', sortOrder);
 
     setLoading(true);
-
-    // It's crucial that your backend's /orders/me endpoint
-    // correctly populates the 'giftCard' field, including 'imageUrl'.
-    // e.g., .populate('giftCard', 'brand value price imageUrl')
-    api.get(`/orders/me?${params.toString()}`) // Changed from /orders/me to /orders/myorders as per your routes
+    api.get(`/orders/me?${params}`)
       .then(res => {
-        // Assuming res.data contains { orders: [], totalPages: N }
         setOrders(res.data.orders);
         setTotalPages(res.data.totalPages);
         setError(null);
@@ -128,170 +131,147 @@ export default function OrdersListPage() {
       .finally(() => setLoading(false));
   }, [currentPage, startDate, endDate, sortField, sortOrder]);
 
-  const goToPage = (page: number) => {
-    if (page < 1 || page > totalPages) return;
-    setCurrentPage(page);
+  const goToPage = (p: number) => {
+    if (p < 1 || p > totalPages) return;
+    setCurrentPage(p);
   };
 
-  if (loading) {
-    return (
-      <div className="max-w-4xl mx-auto mt-12 p-4 bg-white rounded shadow">
-        <h1 className="text-3xl font-bold mb-6">My Orders</h1>
-        <p className="text-center py-12">Loading your orders...</p>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="max-w-4xl mx-auto mt-12 p-4 bg-white rounded shadow">
-        <h1 className="text-3xl font-bold mb-6">My Orders</h1>
-        <p className="text-center py-12 text-red-600">{error}</p>
-      </div>
-    );
-  }
-
-  if (orders.length === 0) {
-    return (
-      <div className="max-w-4xl mx-auto mt-12 p-4 bg-white rounded shadow text-center text-gray-600">
-        <h1 className="text-3xl font-bold mb-6">My Orders</h1>
-        You have no orders yet.
-      </div>
-    );
-  }
-
   return (
-    <div className="max-w-4xl mx-auto mt-12 p-4 bg-white rounded shadow">
-      <h1 className="text-3xl font-bold mb-6">My Orders</h1>
+    <div className="max-w-6xl mx-auto mt-12 p-6 bg-white/80 backdrop-blur-md border border-blue-50 rounded-3xl shadow-xl">
+      <h1 className="text-3xl font-extrabold mb-8 text-slate-900">My Orders</h1>
 
-      {/* Sorting and Date Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
-        {/* Sort by fields */}
-        <label className="flex items-center gap-2 text-sm">
-          Sort by:
-          <select
-            value={sortField}
-            onChange={e => setSortField(e.target.value)}
-            className="border rounded p-1"
-          >
-            <option value="purchasedAt">Purchase Date</option>
-            <option value="totalPrice">Total Price</option>
-            <option value="status">Status</option>
-          </select>
-        </label>
+      {/* Filters */}
+      <div className="mb-8 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-blue-100 shadow-sm">
+        <div className="flex flex-wrap items-center gap-4">
+          {/* Sort Field */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 font-medium">Sort By:</span>
+            <select
+              value={sortField}
+              onChange={e => setSortField(e.target.value)}
+              className="border border-blue-100 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 bg-white"
+            >
+              <option value="purchasedAt">Purchase Date</option>
+              <option value="totalPrice">Total Price</option>
+              <option value="status">Status</option>
+            </select>
+          </div>
 
-        <label className="flex items-center gap-2 text-sm">
-          Order:
-          <select
-            value={sortOrder}
-            onChange={e => setSortOrder(e.target.value as 'asc' | 'desc')}
-            className="border rounded p-1"
-          >
-            <option value="desc">Descending</option>
-            <option value="asc">Ascending</option>
-          </select>
-        </label>
+          {/* Sort Order */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 font-medium">Order:</span>
+            <select
+              value={sortOrder}
+              onChange={e => setSortOrder(e.target.value as 'asc' | 'desc')}
+              className="border border-blue-100 rounded-xl px-3 py-2 text-sm focus:ring-2 focus:ring-blue-400 bg-white"
+            >
+              <option value="desc">Descending</option>
+              <option value="asc">Ascending</option>
+            </select>
+          </div>
 
-        {/* Start Date */}
-        <label className="flex items-center gap-2 text-sm">
-          Start Date:
-          <input
-            type="date"
-            value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="border rounded p-1"
-          />
-        </label>
+          {/* Date Range */}
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 font-medium">From:</span>
+            <input
+              type="date"
+              value={startDate}
+              onChange={e => setStartDate(e.target.value)}
+              className="border border-blue-100 rounded-xl px-3 py-2 text-sm bg-white"
+            />
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-gray-600 font-medium">To:</span>
+            <input
+              type="date"
+              value={endDate}
+              onChange={e => setEndDate(e.target.value)}
+              className="border border-blue-100 rounded-xl px-3 py-2 text-sm bg-white"
+            />
+          </div>
 
-        {/* End Date */}
-        <label className="flex items-center gap-2 text-sm">
-          End Date:
-          <input
-            type="date"
-            value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="border rounded p-1"
-          />
-        </label>
-
-        {(startDate || endDate) && (
-          <button
-            onClick={() => { setStartDate(''); setEndDate(''); }}
-            className="ml-auto text-sm text-blue-600 hover:underline"
-          >
-            Clear Filters
-          </button>
-        )}
+          {/* Clear Filters Button */}
+          {(startDate || endDate) && (
+            <button
+              onClick={() => { setStartDate(''); setEndDate(''); }}
+              className="ml-auto text-sm text-blue-600 hover:text-fuchsia-500 font-medium"
+            >
+              ✕ Clear Filters
+            </button>
+          )}
+        </div>
       </div>
+
+
+      {/* State Messages */}
+      {loading && <p className="text-center py-8">Loading your orders...</p>}
+      {error && (
+        <p className="text-center py-8 text-red-600">{error}</p>
+      )}
+      {!loading && !error && orders.length === 0 && (
+        <p className="text-center py-8 text-gray-500">You have no orders yet.</p>
+      )}
 
       {/* Orders List */}
       <ul className="space-y-6">
         {orders.map(order => (
           <li
             key={order._id}
-            className="border rounded p-4 flex flex-col sm:flex-row items-center gap-4 cursor-pointer hover:bg-gray-50"
+            className="group flex flex-col sm:flex-row items-center gap-6 p-6 rounded-2xl bg-white/90 backdrop-blur-sm border border-blue-50 shadow hover:shadow-xl hover:-translate-y-1 transition cursor-pointer"
             onClick={() => setSelectedOrder(order)}
-            tabIndex={0}
-            role="button"
-            onKeyDown={(e) => { if(e.key === 'Enter') setSelectedOrder(order); }}
           >
-            {/* --- FIX FOR OrdersListPage MAIN LISTING --- */}
-            {order.giftCard ? ( // Check if giftCard is not null
+            {order.giftCard ? (
               <>
-                {order.giftCard.imageUrl && ( // Check if imageUrl exists before rendering img tag
-                  <img
-                    src={order.giftCard.imageUrl}
-                    alt={order.giftCard.brand}
-                    className="w-24 h-24 object-contain rounded"
-                  />
+                {order.giftCard.imageUrl && (
+                  <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded-full ring-2 ring-blue-100 group-hover:ring-blue-300">
+                    <img src={order.giftCard.imageUrl} alt={order.giftCard.brand} className="h-14 w-14 object-contain" />
+                  </div>
                 )}
                 <div className="flex-1">
-                  <div className="text-xl font-semibold">{order.giftCard.brand} Gift Card</div>
-                  <div className="text-gray-600">Value: ${order.giftCard.value}</div>
+                  <div className="text-lg font-bold text-slate-900">{order.giftCard.brand} Gift Card</div>
+                  <div className="text-gray-500 text-sm">Value: ${order.giftCard.value}</div>
                 </div>
               </>
             ) : (
               <div className="w-24 h-24 flex items-center justify-center bg-gray-100 rounded text-xs text-gray-500 text-center">
-                Gift Card<br/>Not Found
+                Gift Card<br />Not Found
               </div>
             )}
-            {/* --- END FIX --- */}
 
-            <div className="flex-1">
-              {/* Other details, potentially including gift card details that are always present or also safely accessed */}
-              <div className="text-gray-700">Quantity: {order.quantity}</div>
-              <div className="text-gray-700">
-                Purchased: {order.purchasedAt ? new Date(order.purchasedAt).toLocaleDateString() : 'N/A'}
-              </div>
+            <div className="flex-1 text-sm text-slate-700">
+              <div>Quantity: {order.quantity}</div>
+              <div>Purchased: {new Date(order.purchasedAt).toLocaleDateString()}</div>
               <div className="mt-1">
-                Status: <span className={`${order.status === 'completed' ? 'text-green-600' : 'text-yellow-600'}`}>
+                Status:{" "}
+                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${order.status === 'completed' ? 'bg-green-100 text-green-700' :
+                    order.status === 'pending' ? 'bg-yellow-100 text-yellow-700' : 'bg-red-100 text-red-700'
+                  }`}>
                   {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                 </span>
               </div>
               {order.code && (
                 <div className="mt-2 flex items-center gap-2">
-                  <span className="font-mono bg-gray-100 px-3 py-1 rounded shadow-sm select-all">{order.code}</span>
+                  <span className="font-mono bg-gray-100 px-3 py-1 rounded select-all">{order.code}</span>
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
                       navigator.clipboard.writeText(order.code || '');
-                      // Replace alert with toast if you have a notification system
-                      alert('Gift card code copied to clipboard!');
+                      alert('Gift card code copied!');
                     }}
-                    className="text-blue-500 hover:underline text-sm"
+                    className="text-blue-500 hover:text-fuchsia-500 text-xs flex items-center gap-1"
                   >
-                    Copy Code
+                    <ClipboardDocumentIcon className="w-4 h-4" /> Copy
                   </button>
                 </div>
               )}
             </div>
-            {order.giftCard && ( // Only show "View Gift Card" if giftCard is available
+            {order.giftCard && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/giftcards/${order.giftCard?._id}`); // Use optional chaining just in case
+                  navigate(`/giftcards/${order.giftCard?._id}`);
                 }}
-                className="mt-2 sm:mt-0 px-5 py-2 rounded bg-blue-600 text-white hover:bg-blue-700 transition whitespace-nowrap"
+                className="mt-2 sm:mt-0 px-4 py-2 text-xs font-semibold rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white hover:shadow-lg hover:from-blue-600 hover:to-fuchsia-600 transition"
               >
                 View Gift Card
               </button>
@@ -300,38 +280,36 @@ export default function OrdersListPage() {
         ))}
       </ul>
 
-
-      {/* Pagination Controls */}
+      {/* Pagination */}
       {totalPages > 1 && (
-        <nav className="mt-6 flex justify-center items-center gap-2" aria-label="Pagination">
+        <div className="mt-8 flex justify-center gap-2">
           <button
             onClick={() => goToPage(currentPage - 1)}
             disabled={currentPage === 1}
-            className={`px-3 py-1 rounded border ${currentPage === 1 ? 'cursor-not-allowed text-gray-400' : 'hover:bg-gray-100'}`}
+            className={`px-3 py-1 rounded-full text-sm border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'}`}
           >
             Previous
           </button>
-          {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNum => (
+          {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
             <button
-              key={pageNum}
-              onClick={() => goToPage(pageNum)}
-              className={`px-3 py-1 rounded border ${pageNum === currentPage ? 'bg-blue-600 text-white' : 'hover:bg-gray-100'}`}
-              aria-current={pageNum === currentPage ? 'page' : undefined}
+              key={page}
+              onClick={() => goToPage(page)}
+              className={`px-3 py-1 rounded-full text-sm border ${page === currentPage ? 'bg-blue-600 text-white' : 'hover:bg-blue-50'}`}
             >
-              {pageNum}
+              {page}
             </button>
           ))}
           <button
             onClick={() => goToPage(currentPage + 1)}
             disabled={currentPage === totalPages}
-            className={`px-3 py-1 rounded border ${currentPage === totalPages ? 'cursor-not-allowed text-gray-400' : 'hover:bg-gray-100'}`}
+            className={`px-3 py-1 rounded-full text-sm border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'}`}
           >
             Next
           </button>
-        </nav>
+        </div>
       )}
 
-      {/* Order Detail Modal */}
+      {/* Modal */}
       <OrderDetailModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
     </div>
   );

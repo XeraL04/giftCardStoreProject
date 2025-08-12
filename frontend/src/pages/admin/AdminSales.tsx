@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import api from '../../api/client';
 
-type User = { _id: string; name: string; email: string; };
-type GiftCard = { _id: string; brand: string; };
+type User = { _id: string; name: string; email: string };
+type GiftCard = { _id: string; brand: string };
 type Order = {
   _id: string;
   user: User;
@@ -31,11 +31,11 @@ export default function AdminSales() {
   const [users, setUsers] = useState<User[]>([]);
   const [giftCards, setGiftCards] = useState<GiftCard[]>([]);
 
-  // Filters state
-  const [startDate, setStartDate] = useState<string>('');
-  const [endDate, setEndDate] = useState<string>('');
-  const [userFilter, setUserFilter] = useState<string>('');
-  const [giftCardFilter, setGiftCardFilter] = useState<string>('');
+  // Filters
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const [userFilter, setUserFilter] = useState('');
+  const [giftCardFilter, setGiftCardFilter] = useState('');
 
   const ORDERS_PER_PAGE = 10;
 
@@ -50,22 +50,19 @@ export default function AdminSales() {
 
   async function fetchUsers() {
     try {
-      const res = await api.get<User[]>('/auth/users'); // Admin-only
+      const res = await api.get<User[]>('/auth/users');
       setUsers(res.data);
-    } catch (err) {
-      console.error('Failed to load users for filter');
+    } catch {
+      console.error('Failed to load users');
     }
   }
 
   async function fetchGiftCards() {
     try {
-      // Use the new interface to correctly type the API response
       const res = await api.get<GiftCardApiResponse>('/giftcards');
-
-      // Access the giftCards array from the response object
       setGiftCards(res.data.giftCards);
-    } catch (err) {
-      console.error('Failed to load gift cards for filter');
+    } catch {
+      console.error('Failed to load gift cards');
     }
   }
 
@@ -102,38 +99,36 @@ export default function AdminSales() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-white rounded shadow">
-
-      <h1 className="text-3xl font-bold mb-6">Sales and Orders</h1>
+    <div className="max-w-7xl mx-auto p-6 bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl">
+      {/* Header */}
+      <h1 className="text-3xl font-extrabold mb-8 text-slate-900">Sales and Orders</h1>
 
       {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="flex flex-wrap gap-4 mb-8">
         <div>
-          <label className="block mb-1 font-semibold">Start Date</label>
+          <label className="block mb-1 text-sm font-semibold text-slate-700">Start Date</label>
           <input
             type="date"
             value={startDate}
-            onChange={(e) => setStartDate(e.target.value)}
-            className="border rounded px-3 py-2"
+            onChange={e => setStartDate(e.target.value)}
+            className="px-4 py-2 border border-blue-100 rounded-full focus:ring-2 focus:ring-blue-400"
           />
         </div>
-
         <div>
-          <label className="block mb-1 font-semibold">End Date</label>
+          <label className="block mb-1 text-sm font-semibold text-slate-700">End Date</label>
           <input
             type="date"
             value={endDate}
-            onChange={(e) => setEndDate(e.target.value)}
-            className="border rounded px-3 py-2"
+            onChange={e => setEndDate(e.target.value)}
+            className="px-4 py-2 border border-blue-100 rounded-full focus:ring-2 focus:ring-blue-400"
           />
         </div>
-
         <div>
-          <label className="block mb-1 font-semibold">User</label>
+          <label className="block mb-1 text-sm font-semibold text-slate-700">User</label>
           <select
             value={userFilter}
             onChange={e => setUserFilter(e.target.value)}
-            className="border rounded px-3 py-2"
+            className="px-4 py-2 border border-blue-100 rounded-full focus:ring-2 focus:ring-blue-400"
           >
             <option value="">All Users</option>
             {users.map(user => (
@@ -141,13 +136,12 @@ export default function AdminSales() {
             ))}
           </select>
         </div>
-
         <div>
-          <label className="block mb-1 font-semibold">Gift Card</label>
+          <label className="block mb-1 text-sm font-semibold text-slate-700">Gift Card</label>
           <select
             value={giftCardFilter}
             onChange={e => setGiftCardFilter(e.target.value)}
-            className="border rounded px-3 py-2"
+            className="px-4 py-2 border border-blue-100 rounded-full focus:ring-2 focus:ring-blue-400"
           >
             <option value="">All Gift Cards</option>
             {giftCards.map(card => (
@@ -155,51 +149,63 @@ export default function AdminSales() {
             ))}
           </select>
         </div>
-
         <div className="self-end">
           <button
-            onClick={() => {
-              setPage(1);  // Reset to first page on filter change
-              fetchOrders(1);
-            }}
-            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            onClick={() => { setPage(1); fetchOrders(1); }}
+            className="px-5 py-2 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white font-semibold shadow hover:from-blue-600 hover:to-fuchsia-600 transition"
           >
             Apply Filters
           </button>
         </div>
       </div>
 
-      {/* Orders Table */}
-      {loading && <p>Loading orders...</p>}
-      {error && <p className="text-red-600">{error}</p>}
-
+      {/* Table States */}
+      {loading && <p className="text-center py-8">Loading orders...</p>}
+      {error && <p className="text-center py-8 text-red-600">{error}</p>}
       {!loading && orders.length === 0 && (
-        <p className="text-center text-gray-500">No orders found.</p>
+        <p className="text-center py-8 text-gray-500">No orders found.</p>
       )}
 
+      {/* Orders Table */}
       {!loading && orders.length > 0 && (
         <>
           <div className="overflow-x-auto">
-            <table className="min-w-full border border-gray-300 rounded">
-              <thead className="bg-gray-100">
-                <tr>
-                  <th className="p-3 border-b border-gray-300 text-left">User</th>
-                  <th className="p-3 border-b border-gray-300 text-left">Gift Card</th>
-                  <th className="p-3 border-b border-gray-300 text-left">Quantity</th>
-                  <th className="p-3 border-b border-gray-300 text-left">Total Price</th>
-                  <th className="p-3 border-b border-gray-300 text-left">Purchased At</th>
-                  <th className="p-3 border-b border-gray-300 text-left">Status</th>
+            <table className="w-full text-sm border-collapse">
+              <thead>
+                <tr className="bg-gradient-to-r from-blue-50 to-fuchsia-50">
+                  <th className="p-3 text-left font-semibold">User</th>
+                  <th className="p-3 text-left font-semibold">Gift Card</th>
+                  <th className="p-3 text-left font-semibold">Quantity</th>
+                  <th className="p-3 text-left font-semibold">Total Price</th>
+                  <th className="p-3 text-left font-semibold">Purchased At</th>
+                  <th className="p-3 text-left font-semibold">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {orders.map((order) => (
-                  <tr key={order._id} className="hover:bg-gray-50">
-                    <td className="p-3 border-b border-gray-300">{order.user.name} <br /><small className="text-xs">{order.user.email}</small></td>
-                    <td className="p-3 border-b border-gray-300">{order.giftCard.brand}</td>
-                    <td className="p-3 border-b border-gray-300">{order.quantity}</td>
-                    <td className="p-3 border-b border-gray-300">${order.totalPrice.toFixed(2)}</td>
-                    <td className="p-3 border-b border-gray-300">{new Date(order.purchasedAt).toLocaleString()}</td>
-                    <td className="p-3 border-b border-gray-300 capitalize">{order.status}</td>
+                {orders.map((order, idx) => (
+                  <tr
+                    key={order._id}
+                    className={`${idx % 2 === 0 ? 'bg-white/60' : 'bg-white/40'} hover:bg-blue-50 transition`}
+                  >
+                    <td className="p-3 font-medium">
+                      {order.user.name}
+                      <div className="text-xs text-gray-500">{order.user.email}</div>
+                    </td>
+                    <td className="p-3">{order.giftCard.brand}</td>
+                    <td className="p-3">{order.quantity}</td>
+                    <td className="p-3 font-semibold text-green-600">${order.totalPrice.toFixed(2)}</td>
+                    <td className="p-3">{new Date(order.purchasedAt).toLocaleString()}</td>
+                    <td className="p-3">
+                      <span className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        order.status === 'completed'
+                          ? 'bg-green-100 text-green-700'
+                          : order.status === 'pending'
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}>
+                        {order.status}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -208,30 +214,29 @@ export default function AdminSales() {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <nav className="mt-6 flex justify-center gap-2" aria-label="Pagination">
+            <nav className="mt-8 flex justify-center gap-2" aria-label="Pagination">
               <button
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
-                className="px-3 py-1 rounded border disabled:opacity-50"
+                className="px-3 py-1 rounded-full border text-sm disabled:opacity-50 hover:bg-blue-50"
               >
                 Previous
               </button>
-              {[...Array(totalPages)].map((_, i) => {
-                const pageNum = i + 1;
-                return (
-                  <button
-                    key={pageNum}
-                    onClick={() => setPage(pageNum)}
-                    className={`px-3 py-1 rounded border ${pageNum === page ? 'bg-blue-600 text-white' : 'hover:bg-gray-200'}`}
-                  >
-                    {pageNum}
-                  </button>
-                );
-              })}
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(p => (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`px-3 py-1 rounded-full border text-sm ${
+                    p === page ? 'bg-blue-600 text-white' : 'hover:bg-blue-50'
+                  }`}
+                >
+                  {p}
+                </button>
+              ))}
               <button
                 onClick={() => setPage(page + 1)}
                 disabled={page === totalPages}
-                className="px-3 py-1 rounded border disabled:opacity-50"
+                className="px-3 py-1 rounded-full border text-sm disabled:opacity-50 hover:bg-blue-50"
               >
                 Next
               </button>

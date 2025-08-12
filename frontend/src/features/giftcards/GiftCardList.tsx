@@ -20,11 +20,14 @@ export function GiftCardList() {
     setLoading(true);
     setError(null);
 
-    api.get('/giftcards')
+    api
+      .get('/giftcards')
       .then(res => {
         setData(res.data.giftCards || []);
       })
-      .catch(err => setError(err.message || 'Could not load gift cards.'))
+      .catch(err =>
+        setError(err.message || 'Could not load gift cards.')
+      )
       .finally(() => setLoading(false));
   };
 
@@ -32,45 +35,86 @@ export function GiftCardList() {
     fetchGiftCards();
   }, []);
 
-  if (loading) return <div className="text-center py-10">Loading gift cards...</div>;
-  if (error) return (
-    <div className="text-center py-10 text-red-600">
-      <p>Error: {error}</p>
-      <button
-        onClick={fetchGiftCards}
-        className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition"
-      >
-        Retry
-      </button>
-    </div>
-  );
+  /** 🔹 Skeleton Loader when loading */
+  if (loading)
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="h-64 rounded-3xl bg-gradient-to-br from-gray-200 via-gray-100 to-gray-200 animate-pulse"
+          ></div>
+        ))}
+      </div>
+    );
 
-  if (data.length === 0) return (
-    <div className="text-center py-10 text-gray-500">
-      No gift cards available right now. Please check back later.
-    </div>
-  );
+  /** 🔹 Error State with accent style */
+  if (error)
+    return (
+      <div className="text-center py-10">
+        <p className="text-red-600 text-lg font-semibold">⚠ {error}</p>
+        <button
+          onClick={fetchGiftCards}
+          className="mt-4 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-full shadow hover:shadow-lg transition"
+        >
+          Retry
+        </button>
+      </div>
+    );
+
+  /** 🔹 Empty state with matching style */
+  if (data.length === 0)
+    return (
+      <div className="text-center py-16 text-gray-500 bg-white/80 backdrop-blur-md rounded-2xl shadow-inner">
+        No gift cards available right now. Please check back later.
+      </div>
+    );
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
       {data.map(card => (
         <article
           key={card._id}
-          className="bg-white rounded-lg shadow hover:shadow-md hover:scale-[1.03] transition-transform p-5 flex flex-col items-center"
+          className="group relative bg-white/80 backdrop-blur-sm border border-blue-50 rounded-3xl shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-transform p-6 flex flex-col items-center text-center"
           tabIndex={0}
           aria-label={`${card.brand} Gift Card`}
         >
-          <img
-            src={card.imageUrl}
-            alt={`${card.brand} logo`}
-            className="h-24 w-24 object-contain mb-3 rounded"
-            loading="lazy"
-          />
-          <h3 className="font-semibold text-lg text-center">{card.brand}</h3>
-          <p className="text-gray-600 mt-1 text-center">${card.price.toFixed(2)} &bull; Value: ${card.value.toFixed(2)}</p>
+          {/* Brand image */}
+          <div className="relative mb-4">
+            <img
+              src={card.imageUrl}
+              alt={`${card.brand} logo`}
+              className="h-24 w-24 object-contain rounded-full bg-gray-100 p-3 shadow-md ring-2 ring-blue-100 group-hover:ring-blue-300 transition"
+              loading="lazy"
+            />
+            {card.stock <= 5 && (
+              <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow">
+                Low Stock
+              </span>
+            )}
+          </div>
+
+          {/* Brand name */}
+          <h3 className="font-bold text-xl text-slate-900 mb-1 group-hover:text-blue-700">
+            {card.brand}
+          </h3>
+
+          {/* Value & Price */}
+          <p className="text-gray-600 mb-4">
+            Value:{" "}
+            <span className="font-semibold text-slate-900">
+              ${card.value.toFixed(2)}
+            </span>{" "}
+            | Price:{" "}
+            <span className="font-semibold text-green-600">
+              ${card.price.toFixed(2)}
+            </span>
+          </p>
+
+          {/* CTA Button */}
           <Link
             to={`/giftcards/${card._id}`}
-            className="mt-4 bg-blue-600 text-white px-5 py-2 rounded hover:bg-blue-700 transition text-center w-full"
+            className="mt-auto w-full py-3 px-5 bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white font-semibold rounded-full shadow hover:shadow-xl hover:from-blue-600 hover:to-fuchsia-600 transition-all"
           >
             View Details
           </Link>

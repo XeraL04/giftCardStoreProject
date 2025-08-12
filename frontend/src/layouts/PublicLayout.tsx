@@ -8,8 +8,14 @@ type Props = {
 export default function PublicLayout({ children }: Props) {
   return (
     <div className="min-h-screen flex flex-col bg-gray-50">
+      {/* Floating Navbar */}
       <Navbar />
-      <main className="flex-1 container mx-auto px-4">{children}</main>
+
+      {/* Main Content with top padding */}
+      <main className="flex-1 container mx-auto px-4 pt-32">
+        {children}
+      </main>
+
       <Footer />
     </div>
   );

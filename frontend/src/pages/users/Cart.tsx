@@ -2,6 +2,7 @@ import { useCartStore } from '../../app/store';
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import api from '../../api/client';
+import { TrashIcon } from '@heroicons/react/24/solid';
 
 export default function Cart() {
   const items = useCartStore(state => state.items);
@@ -11,7 +12,6 @@ export default function Cart() {
 
   const [loading, setLoading] = useState(false);
   const [updatingItemIds, setUpdatingItemIds] = useState<string[]>([]);
-
   const navigate = useNavigate();
 
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -26,7 +26,7 @@ export default function Cart() {
       const response = await api.post('/orders/simulate-checkout', {
         items: items.map(({ giftCardId, quantity }) => ({ giftCardId, quantity })),
       });
-      clearCart(); // clear cart on successful order simulation
+      clearCart();
       navigate('/checkout/success', { state: { orders: response.data.orders } });
     } catch (error: any) {
       alert(error.response?.data?.message || 'Simulated checkout failed');
@@ -35,7 +35,6 @@ export default function Cart() {
     }
   };
 
-
   const handleQuantityChange = (giftCardId: string, qty: number) => {
     if (qty < 1) return;
     setUpdatingItemIds(prev => [...prev, giftCardId]);
@@ -43,42 +42,57 @@ export default function Cart() {
     setUpdatingItemIds(prev => prev.filter(id => id !== giftCardId));
   };
 
-
-
-
+  // Empty state
   if (items.length === 0) {
     return (
-      <div className="max-w-4xl mx-auto mt-20 text-center text-gray-600">
-        Your cart is empty. <Link to="/shop" className="text-blue-600 underline">Shop now</Link>
+      <div className="max-w-3xl mx-auto mt-20 text-center">
+        <div className="bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-lg p-10">
+          <p className="text-gray-600 text-lg mb-4">Your cart is empty.</p>
+          <Link
+            to="/shop"
+            className="inline-block px-6 py-3 bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white rounded-full shadow hover:shadow-lg hover:from-blue-600 hover:to-fuchsia-600 transition"
+          >
+            Shop Now
+          </Link>
+        </div>
       </div>
     );
   }
 
   return (
-    <main className="max-w-5xl mx-auto my-12 p-6 bg-white rounded shadow">
-      <h1 className="text-3xl font-bold mb-6">Your Shopping Cart</h1>
-      <ul className="divide-y divide-gray-200">
+    <main className="max-w-6xl mx-auto my-12 p-8 bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl">
+      {/* Title */}
+      <h1 className="text-3xl font-extrabold mb-8 text-slate-900">Your Shopping Cart</h1>
+
+      {/* Cart Items */}
+      <ul className="divide-y divide-blue-50">
         {items.map(item => (
-          <li key={item.giftCardId} className="flex items-center py-4 gap-4">
-            {item.imageUrl ? (
-              <img
-                src={item.imageUrl}
-                alt={item.brand}
-                className="w-20 h-20 object-contain rounded"
-              />
-            ) : (
-              <div className="w-20 h-20 bg-gray-200 rounded flex items-center justify-center text-gray-400">
-                No Image
-              </div>
-            )}
-            <div className="flex-1">
-              <div className="font-semibold text-lg">{item.brand}</div>
-              <div className="text-gray-600">${item.price} per card</div>
+          <li
+            key={item.giftCardId}
+            className="flex flex-col sm:flex-row items-center gap-6 py-6"
+          >
+            {/* Image */}
+            <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded-full ring-2 ring-blue-100">
+              {item.imageUrl ? (
+                <img
+                  src={item.imageUrl}
+                  alt={item.brand}
+                  className="h-14 w-14 object-contain"
+                />
+              ) : (
+                <span className="text-gray-400 text-xs">No Image</span>
+              )}
             </div>
-            <div className="flex items-center gap-2">
-              <label htmlFor={`quantity-${item.giftCardId}`} className="sr-only">
-                Quantity
-              </label>
+
+            {/* Info */}
+            <div className="flex-1 text-center sm:text-left">
+              <div className="font-bold text-lg text-slate-900">{item.brand}</div>
+              <div className="text-gray-600 text-sm">${item.price} per card</div>
+            </div>
+
+            {/* Quantity */}
+            <div className="flex items-center gap-3">
+              <label htmlFor={`quantity-${item.giftCardId}`} className="sr-only">Quantity</label>
               <input
                 id={`quantity-${item.giftCardId}`}
                 type="number"
@@ -90,35 +104,48 @@ export default function Cart() {
                     handleQuantityChange(item.giftCardId, val);
                   }
                 }}
-                className="w-16 border rounded px-2 py-1"
+                className="w-20 px-3 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
+              {updatingItemIds.includes(item.giftCardId) && (
+                <span className="text-xs text-gray-500">Updating...</span>
+              )}
             </div>
-            <div className="ml-6 font-semibold">${(item.quantity * item.price).toFixed(2)}</div>
+
+            {/* Line total */}
+            <div className="font-bold text-slate-900">
+              ${(item.quantity * item.price).toFixed(2)}
+            </div>
+
+            {/* Remove */}
             <button
               onClick={() => removeFromCart(item.giftCardId)}
-              className="ml-6 text-red-600 hover:text-red-800"
               aria-label={`Remove ${item.brand} from cart`}
+              className="ml-2 p-2 text-red-500 hover:text-red-700 rounded-full hover:bg-red-50 transition"
             >
-              &times;
+              <TrashIcon className="w-5 h-5" />
             </button>
           </li>
         ))}
       </ul>
-      <div className="mt-6 flex justify-between items-center font-semibold text-xl">
-        <div>Total:</div>
-        <div>${totalPrice.toFixed(2)}</div>
+
+      {/* Total */}
+      <div className="mt-8 flex justify-between items-center font-semibold text-lg border-t border-blue-50 pt-6">
+        <span>Total:</span>
+        <span>${totalPrice.toFixed(2)}</span>
       </div>
-      <div className="mt-8 flex justify-end gap-4">
+
+      {/* Actions */}
+      <div className="mt-8 flex flex-wrap justify-end gap-4">
         <button
-          className="px-5 py-2 bg-gray-300 rounded hover:bg-gray-400 transition"
           onClick={() => clearCart()}
+          className="px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
         >
           Clear Cart
         </button>
         <button
           disabled={loading}
           onClick={handleSimulateCheckout}
-          className="bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700 transition disabled:opacity-50"
+          className="px-6 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow hover:shadow-lg hover:from-green-600 hover:to-emerald-600 transition disabled:opacity-60"
         >
           {loading ? 'Processing...' : 'Proceed to Checkout'}
         </button>
