@@ -19,7 +19,8 @@ export default function AdminSidebar() {
   };
 
   return (
-    <aside className="w-64 bg-white/90 backdrop-blur-md border-r border-blue-100 shadow-lg flex flex-col">
+    <aside className="fixed left-0 top-0 h-screen w-64 bg-white/90 backdrop-blur-md border-r border-blue-100 shadow-lg flex flex-col overflow-y-auto">
+
       {/* Top Brand */}
       <div className="p-6 text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-fuchsia-500 to-purple-600 border-b border-blue-50">
         Admin Panel

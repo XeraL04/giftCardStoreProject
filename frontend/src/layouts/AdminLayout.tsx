@@ -11,7 +11,7 @@ export function AdminLayout({ children }: AdminLayoutProps) {
   return (
     <div className="flex min-h-screen bg-gray-100">
       <AdminSidebar />
-      <main className="flex-1 p-8 overflow-auto">
+      <main className="flex-1 p-8 overflow-auto ml-64">
         {/* Render children if supplied, or use Outlet for nested routes */}
         {children ?? <Outlet />}
       </main>

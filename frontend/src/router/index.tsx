@@ -21,6 +21,8 @@ import AdminUsers from '../pages/admin/AdminUsers';
 import AdminGiftCards from '../pages/admin/AdminGiftCards';
 import AdminSales from '../pages/admin/AdminSales';
 import AdminUserProfile from '../pages/admin/AdminUserProfile';
+import PendingPayment from '../pages/users/checkout/PendingPayment';
+import ProofViewer from '../components/users/ProofViewer';
 
 export const router = createBrowserRouter([
   {
@@ -40,6 +42,8 @@ export const router = createBrowserRouter([
       { path: '/orders', element: <AuthRoute><OrdersListPage /></AuthRoute> },
       { path: '/profile/edit', element: <AuthRoute><ProfileEditPage /></AuthRoute> },
       { path: '/checkout/success', element: <AuthRoute><CheckoutSuccess /></AuthRoute> },
+      { path: '/checkout/pending-payment', element: <AuthRoute><PendingPayment /></AuthRoute> },
+      { path: '/proofs/:orderId', element: <AuthRoute><ProofViewer /></AuthRoute> },
 
       // Admin-specific routes. The AdminRoute will handle access control.
       { path: '/admin', element: <AdminRoute><AdminUsers /></AdminRoute> },

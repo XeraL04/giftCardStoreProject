@@ -5,31 +5,72 @@ import api from '../../api/client';
 import { TrashIcon } from '@heroicons/react/24/solid';
 
 export default function Cart() {
-  const items = useCartStore(state => state.items);
-  const removeFromCart = useCartStore(state => state.removeFromCart);
-  const updateQuantity = useCartStore(state => state.updateQuantity);
-  const clearCart = useCartStore(state => state.clearCart);
+  const items = useCartStore((state) => state.items);
+  const removeFromCart = useCartStore((state) => state.removeFromCart);
+  const updateQuantity = useCartStore((state) => state.updateQuantity);
+  const clearCart = useCartStore((state) => state.clearCart);
 
   const [loading, setLoading] = useState(false);
   const [updatingItemIds, setUpdatingItemIds] = useState<string[]>([]);
+  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'baridimob' | 'online' | 'whatsapp' | ''>('');
   const navigate = useNavigate();
 
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
 
-  const handleSimulateCheckout = async () => {
+  const handleCheckout = async () => {
     if (items.length === 0) {
       alert('Your cart is empty!');
       return;
     }
+    if (!paymentMethod) {
+      alert('Please select a payment method.');
+      return;
+    }
+
     setLoading(true);
     try {
-      const response = await api.post('/orders/simulate-checkout', {
-        items: items.map(({ giftCardId, quantity }) => ({ giftCardId, quantity })),
+      // For simplicity, handle only one item per checkout
+      const firstItem = items[0];
+
+      const response = await api.post('/orders', {
+        giftCardId: firstItem.giftCardId,
+        quantity: firstItem.quantity,
+        paymentMethod,
       });
+
       clearCart();
-      navigate('/checkout/success', { state: { orders: response.data.orders } });
+
+      if (paymentMethod === 'online') {
+        navigate('/checkout/success', { state: { orders: [response.data.order] } });
+      } 
+      else if (paymentMethod === 'whatsapp') {
+        // If backend sent a WhatsApp link, open it immediately to start the chat
+        if (response.data.whatsappLink) {
+          window.open(response.data.whatsappLink, '_blank');
+        }
+        navigate('/checkout/pending-payment', {
+          state: {
+            order: response.data.order,
+            paymentInstructions: response.data.paymentInstructions,
+            paymentReferenceCode: response.data.paymentReferenceCode,
+            paymentDueDate: response.data.paymentDueDate,
+            whatsappLink: response.data.whatsappLink || null,
+          },
+        });
+      } 
+      else {
+        // Bank transfer or BaridiMob
+        navigate('/checkout/pending-payment', {
+          state: {
+            order: response.data.order,
+            paymentInstructions: response.data.paymentInstructions,
+            paymentReferenceCode: response.data.paymentReferenceCode,
+            paymentDueDate: response.data.paymentDueDate,
+          },
+        });
+      }
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Simulated checkout failed');
+      alert(error.response?.data?.message || 'Checkout failed');
     } finally {
       setLoading(false);
     }
@@ -37,9 +78,9 @@ export default function Cart() {
 
   const handleQuantityChange = (giftCardId: string, qty: number) => {
     if (qty < 1) return;
-    setUpdatingItemIds(prev => [...prev, giftCardId]);
+    setUpdatingItemIds((prev) => [...prev, giftCardId]);
     updateQuantity(giftCardId, qty);
-    setUpdatingItemIds(prev => prev.filter(id => id !== giftCardId));
+    setUpdatingItemIds((prev) => prev.filter((id) => id !== giftCardId));
   };
 
   // Empty state
@@ -66,19 +107,12 @@ export default function Cart() {
 
       {/* Cart Items */}
       <ul className="divide-y divide-blue-50">
-        {items.map(item => (
-          <li
-            key={item.giftCardId}
-            className="flex flex-col sm:flex-row items-center gap-6 py-6"
-          >
+        {items.map((item) => (
+          <li key={item.giftCardId} className="flex flex-col sm:flex-row items-center gap-6 py-6">
             {/* Image */}
             <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded-full ring-2 ring-blue-100">
               {item.imageUrl ? (
-                <img
-                  src={item.imageUrl}
-                  alt={item.brand}
-                  className="h-14 w-14 object-contain"
-                />
+                <img src={item.imageUrl} alt={item.brand} className="h-14 w-14 object-contain" />
               ) : (
                 <span className="text-gray-400 text-xs">No Image</span>
               )}
@@ -92,13 +126,15 @@ export default function Cart() {
 
             {/* Quantity */}
             <div className="flex items-center gap-3">
-              <label htmlFor={`quantity-${item.giftCardId}`} className="sr-only">Quantity</label>
+              <label htmlFor={`quantity-${item.giftCardId}`} className="sr-only">
+                Quantity
+              </label>
               <input
                 id={`quantity-${item.giftCardId}`}
                 type="number"
                 min={1}
                 value={item.quantity}
-                onChange={e => {
+                onChange={(e) => {
                   const val = parseInt(e.target.value);
                   if (!isNaN(val)) {
                     handleQuantityChange(item.giftCardId, val);
@@ -134,6 +170,53 @@ export default function Cart() {
         <span>${totalPrice.toFixed(2)}</span>
       </div>
 
+      {/* Payment Method Selection */}
+      <div className="w-full mt-8">
+        <h2 className="text-lg font-semibold mb-4 text-slate-900">Select Payment Method</h2>
+        <div className="flex flex-col gap-3">
+          <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-blue-50">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="bank_transfer"
+              checked={paymentMethod === 'bank_transfer'}
+              onChange={() => setPaymentMethod('bank_transfer')}
+            />
+            <span>Bank Transfer / CCP Deposit</span>
+          </label>
+          <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-blue-50">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="baridimob"
+              checked={paymentMethod === 'baridimob'}
+              onChange={() => setPaymentMethod('baridimob')}
+            />
+            <span>BaridiMob</span>
+          </label>
+          <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-green-50">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="whatsapp"
+              checked={paymentMethod === 'whatsapp'}
+              onChange={() => setPaymentMethod('whatsapp')}
+            />
+            <span>💬 Contact us on WhatsApp</span>
+          </label>
+          <label className="flex items-center gap-3 p-3 border rounded-xl cursor-pointer hover:bg-blue-50">
+            <input
+              type="radio"
+              name="paymentMethod"
+              value="online"
+              checked={paymentMethod === 'online'}
+              onChange={() => setPaymentMethod('online')}
+            />
+            <span>Online Payment (Coming Soon)</span>
+          </label>
+        </div>
+      </div>
+
       {/* Actions */}
       <div className="mt-8 flex flex-wrap justify-end gap-4">
         <button
@@ -144,7 +227,7 @@ export default function Cart() {
         </button>
         <button
           disabled={loading}
-          onClick={handleSimulateCheckout}
+          onClick={handleCheckout}
           className="px-6 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow hover:shadow-lg hover:from-green-600 hover:to-emerald-600 transition disabled:opacity-60"
         >
           {loading ? 'Processing...' : 'Proceed to Checkout'}
