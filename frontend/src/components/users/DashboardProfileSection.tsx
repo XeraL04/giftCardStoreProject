@@ -13,13 +13,13 @@ export function DashboardProfileSection() {
   const [testimonialSubmitted, setTestimonialSubmitted] = useState(false);
   const [loadingTestimonial, setLoadingTestimonial] = useState(false);
   const [testimonialError, setTestimonialError] = useState<string | null>(null);
-  // const [rating, setRating] = useState(0);
 
   const navigate = useNavigate();
   const commentRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
-    api.get('/orders/me')
+    api
+      .get('/orders/me')
       .then(res => setOrderCount(res.data.length))
       .catch(() => setOrderCount(0));
   }, []);
@@ -49,12 +49,11 @@ export function DashboardProfileSection() {
   };
 
   return (
-    <section className="max-w-5xl mx-auto my-16 bg-white/80 backdrop-blur-md border border-blue-50 rounded-3xl shadow-xl overflow-hidden">
-
+    <section className="max-w-5xl mx-auto my-3 bg-white/80 backdrop-blur-md border border-blue-50 rounded-3xl shadow-xl overflow-hidden">
       {/* Gradient Header */}
-      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-fuchsia-600 px-8 py-10 text-white text-center">
-        <div className="flex flex-col items-center">
-          <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center shadow-lg ring-2 ring-white/30 mb-4">
+      <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-fuchsia-600 px-6 sm:px-8 py-10 text-white text-center">
+        <div className="flex flex-col items-center max-w-xl mx-auto">
+          <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-white/20 flex items-center justify-center shadow-lg ring-2 ring-white/30 mb-4">
             {user?.avatarUrl ? (
               <img
                 src={user.avatarUrl}
@@ -62,18 +61,18 @@ export function DashboardProfileSection() {
                 className="w-full h-full rounded-full object-cover"
               />
             ) : (
-              <UserCircleIcon className="w-14 h-14 text-white/90" />
+              <UserCircleIcon className="w-12 h-12 sm:w-14 sm:h-14 text-white/90" />
             )}
           </div>
-          <h2 className="text-3xl font-extrabold mb-2">Welcome back, {user?.name || 'Friend'}!</h2>
-          <p className="text-lg text-blue-100 max-w-2xl">
+          <h2 className="text-2xl sm:text-3xl font-extrabold mb-2">Welcome back, {user?.name || 'Friend'}!</h2>
+          <p className="text-lg text-blue-100 max-w-md sm:max-w-2xl">
             This is your profile hub. Review orders, update your info, and share your experience!
           </p>
         </div>
       </div>
 
       {/* Action Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-8 py-10">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-6 sm:px-8 py-10">
         <div
           onClick={() => navigate('/orders')}
           role="button"
@@ -82,12 +81,12 @@ export function DashboardProfileSection() {
           aria-label="My Orders"
           className="group bg-white/80 backdrop-blur-sm border border-blue-50 rounded-2xl p-6 flex flex-col items-center shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer focus:ring-2 focus:ring-blue-400"
         >
-          <div className="w-16 h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-fuchsia-500 group-hover:text-white transition">
-            <ClipboardDocumentListIcon className="w-8 h-8" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-blue-100 text-blue-600 rounded-full flex items-center justify-center mb-3 group-hover:bg-gradient-to-br group-hover:from-blue-500 group-hover:to-fuchsia-500 group-hover:text-white transition">
+            <ClipboardDocumentListIcon className="w-6 h-6 sm:w-8 sm:h-8" />
           </div>
-          <h3 className="font-bold text-xl mb-1 text-slate-900">My Orders</h3>
-          <p className="text-gray-500 mb-2 text-lg">{orderCount} order{orderCount === 1 ? '' : 's'}</p>
-          <span className="text-blue-700 text-sm">View all your purchased gift cards</span>
+          <h3 className="font-bold text-lg sm:text-xl mb-1 text-slate-900">My Orders</h3>
+          <p className="text-gray-500 mb-2 text-base">{orderCount} order{orderCount === 1 ? '' : 's'}</p>
+          <span className="text-blue-700 text-sm sm:text-base">View all your purchased gift cards</span>
         </div>
 
         <div
@@ -98,17 +97,17 @@ export function DashboardProfileSection() {
           aria-label="Edit Profile"
           className="group bg-white/80 backdrop-blur-sm border border-green-50 rounded-2xl p-6 flex flex-col items-center shadow-lg hover:shadow-2xl hover:-translate-y-1 transition-all cursor-pointer focus:ring-2 focus:ring-green-400"
         >
-          <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-3 group-hover:bg-gradient-to-br group-hover:from-green-500 group-hover:to-blue-500 group-hover:text-white transition">
-            <UserCircleIcon className="w-8 h-8" />
+          <div className="w-14 h-14 sm:w-16 sm:h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mb-3 group-hover:bg-gradient-to-br group-hover:from-green-500 group-hover:to-blue-500 group-hover:text-white transition">
+            <UserCircleIcon className="w-6 h-6 sm:w-8 sm:h-8" />
           </div>
-          <h3 className="font-bold text-xl mb-1 text-slate-900">Edit Profile</h3>
-          <p className="text-gray-500 mb-2 text-lg">Update your info</p>
-          <span className="text-green-700 text-sm">Change your name, email, phone and password</span>
+          <h3 className="font-bold text-lg sm:text-xl mb-1 text-slate-900">Edit Profile</h3>
+          <p className="text-gray-500 mb-2 text-base">Update your info</p>
+          <span className="text-green-700 text-sm sm:text-base">Change your name, email, phone and password</span>
         </div>
       </div>
 
       {/* Testimonial Form */}
-      <div className="bg-white/90 backdrop-blur-sm border border-yellow-100 rounded-2xl mx-8 mb-10 p-6 shadow-lg max-w-">
+      <div className="bg-white/90 backdrop-blur-sm border border-yellow-100 rounded-2xl sm:mx-8 mb-10 p-6 sm:p-8 max-w-4xl mx-auto">
         <h3 className="font-bold text-xl mb-4 text-center text-yellow-700 flex items-center justify-center gap-2">
           <span className="text-3xl">⭐</span> Share Your Experience
         </h3>
@@ -122,7 +121,7 @@ export function DashboardProfileSection() {
             {/* Rating Stars */}
             <label htmlFor="rating" className="flex flex-col gap-1">
               <span className="font-semibold text-slate-700">Rating</span>
-              <div className="flex gap-1">
+              <div className="flex gap-1 justify-center sm:justify-start">
                 {[1, 2, 3, 4, 5].map((star) => (
                   <button
                     key={star}
@@ -132,8 +131,9 @@ export function DashboardProfileSection() {
                     aria-label={`Rate ${star} star${star > 1 ? 's' : ''}`}
                   >
                     <StarIcon
-                      className={`w-8 h-8 transition-colors ${star <= testimonialRating ? 'text-yellow-400' : 'text-gray-300'
-                        }`}
+                      className={`w-7 h-7 sm:w-8 sm:h-8 transition-colors ${
+                        star <= testimonialRating ? 'text-yellow-400' : 'text-gray-300'
+                      }`}
                     />
                   </button>
                 ))}
@@ -151,8 +151,9 @@ export function DashboardProfileSection() {
                 required
                 disabled={loadingTestimonial}
                 placeholder="Tell us about your experience (at least 10 characters)…"
-                className={`p-3 rounded-xl border resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${!isCommentValid && testimonialComment.length > 0 ? 'border-red-500' : 'border-yellow-200'
-                  }`}
+                className={`p-3 rounded-xl border resize-none focus:outline-none focus:ring-2 focus:ring-yellow-400 transition ${
+                  !isCommentValid && testimonialComment.length > 0 ? 'border-red-500' : 'border-yellow-200'
+                }`}
               />
               {!isCommentValid && testimonialComment.length > 0 && (
                 <small className="text-red-600">Please enter at least 10 characters.</small>

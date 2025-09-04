@@ -78,14 +78,14 @@ export default function ProfileEditPage() {
 
   return (
     <div className="min-h-[80vh] flex items-center justify-center px-4 py-10">
-      <div className="w-full max-w-lg bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl p-8">
+      <div className="w-full max-w-lg bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl p-6 sm:p-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center items-center w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white shadow-lg mb-4">
             <UserCircleIcon className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Edit Profile</h1>
-          <p className="text-gray-500 text-sm mt-1">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Edit Profile</h1>
+          <p className="text-gray-500 text-sm sm:text-base mt-1">
             Update your information and manage your account details
           </p>
         </div>
@@ -151,7 +151,9 @@ export default function ProfileEditPage() {
                 errors.phoneNumber ? "border-red-400" : "border-blue-100"
               } focus:outline-none focus:ring-2 focus:ring-blue-500 transition`}
             />
-            {errors.phoneNumber && <p className="text-xs text-red-500 mt-1">{errors.phoneNumber.message}</p>}
+            {errors.phoneNumber && (
+              <p className="text-xs text-red-500 mt-1">{errors.phoneNumber.message}</p>
+            )}
           </div>
 
           {/* Password */}

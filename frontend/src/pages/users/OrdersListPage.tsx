@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+// import { useNavigate } from 'react-router-dom';
 import { ClipboardDocumentIcon } from '@heroicons/react/24/solid';
 
 import OrderDetailModal from '../../components/users/OrderDetailModal';
@@ -31,10 +31,6 @@ type Order = {
   paymentProof?: PaymentProof;
 };
 
-
-
-
-
 const ITEMS_PER_PAGE = 5;
 
 export default function OrdersListPage() {
@@ -50,7 +46,7 @@ export default function OrdersListPage() {
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
 
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   useEffect(() => {
     const params = new URLSearchParams();
@@ -80,12 +76,14 @@ export default function OrdersListPage() {
 
   return (
     <>
-      <div className="max-w-6xl mx-auto mt-12 p-6 bg-white/80 backdrop-blur-md border border-blue-50 rounded-3xl shadow-xl">
-        <h1 className="text-3xl font-extrabold mb-8 text-slate-900">My Orders</h1>
+      <div className="max-w-6xl mx-auto mt-6 px-4 sm:px-6 lg:px-8 p-6 bg-white/80 backdrop-blur-md border border-blue-50 rounded-3xl shadow-xl">
+        <h1 className="text-2xl sm:text-3xl font-extrabold mb-8 text-slate-900 text-center sm:text-left">
+          My Orders
+        </h1>
 
         {/* Filters */}
         <div className="mb-8 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-blue-100 shadow-sm">
-          <div className="flex flex-wrap items-center gap-4">
+          <div className="flex flex-wrap gap-4 items-center justify-center sm:justify-start">
             {/* Sort Field */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-gray-600 font-medium">Sort By:</span>
@@ -166,7 +164,7 @@ export default function OrdersListPage() {
               {order.giftCard ? (
                 <>
                   {order.giftCard.imageUrl && (
-                    <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded-full ring-2 ring-blue-100 group-hover:ring-blue-300">
+                    <div className="w-20 h-20 flex items-center justify-center bg-gray-100 rounded-full ring-2 ring-blue-100 group-hover:ring-blue-300 flex-shrink-0">
                       <img
                         src={order.giftCard.imageUrl}
                         alt={order.giftCard.brand}
@@ -174,9 +172,9 @@ export default function OrdersListPage() {
                       />
                     </div>
                   )}
-                  <div className="flex-1">
-                    <div className="text-lg font-bold text-slate-900">{order.giftCard.brand} Gift Card</div>
-                    <div className="text-gray-500 text-sm">Value: ${order.giftCard.value}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-lg font-bold text-slate-900 truncate">{order.giftCard.brand} Gift Card</div>
+                    <div className="text-gray-500 text-sm truncate">Value: ${order.giftCard.value}</div>
                   </div>
                 </>
               ) : (
@@ -185,11 +183,11 @@ export default function OrdersListPage() {
                 </div>
               )}
 
-              <div className="flex-1 text-sm text-slate-700">
+              <div className="flex-1 text-sm text-slate-700 min-w-0">
                 <div>Quantity: {order.quantity}</div>
                 <div>Purchased: {new Date(order.purchasedAt).toLocaleDateString()}</div>
                 <div className="mt-1">
-                  Status:{" "}
+                  Status:{' '}
                   <span
                     className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
                       order.status === 'completed'
@@ -212,13 +210,15 @@ export default function OrdersListPage() {
                         alert('Gift card code copied!');
                       }}
                       className="text-blue-500 hover:text-fuchsia-500 text-xs flex items-center gap-1"
+                      aria-label="Copy gift card code"
                     >
                       <ClipboardDocumentIcon className="w-4 h-4" /> Copy
                     </button>
                   </div>
                 )}
               </div>
-              {order.giftCard && (
+
+              {/* {order.giftCard && (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -228,14 +228,14 @@ export default function OrdersListPage() {
                 >
                   View Gift Card
                 </button>
-              )}
+              )} */}
             </li>
           ))}
         </ul>
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="mt-8 flex justify-center gap-2">
+          <div className="mt-8 flex flex-wrap justify-center gap-2">
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}

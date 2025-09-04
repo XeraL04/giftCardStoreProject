@@ -67,8 +67,8 @@ export default function AdminUsers() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto p-6 bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl">
-      <h1 className="text-3xl font-extrabold mb-8 text-slate-900">
+    <div className="max-w-7xl mx-auto p-4 sm:p-6 bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl">
+      <h1 className="text-2xl sm:text-3xl font-extrabold mb-8 text-slate-900 text-center sm:text-left">
         User Management
       </h1>
 
@@ -80,25 +80,15 @@ export default function AdminUsers() {
       )}
 
       {!loading && !error && (
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm border-collapse">
+        <div className="overflow-x-auto rounded-lg border border-blue-50 shadow-inner">
+          <table className="min-w-full text-sm border-collapse">
             <thead>
-              <tr className="bg-gradient-to-r from-blue-50 to-fuchsia-50">
-                <th className="p-3 text-left font-semibold text-slate-700">
-                  Name
-                </th>
-                <th className="p-3 text-left font-semibold text-slate-700">
-                  Email
-                </th>
-                <th className="p-3 text-left font-semibold text-slate-700">
-                  Phone
-                </th>
-                <th className="p-3 text-left font-semibold text-slate-700">
-                  Role
-                </th>
-                <th className="p-3 text-left font-semibold text-slate-700">
-                  Actions
-                </th>
+              <tr className="bg-gradient-to-r from-blue-50 to-fuchsia-50 text-slate-700">
+                <th className="px-3 py-3 text-left font-semibold">Name</th>
+                <th className="px-3 py-3 text-left font-semibold">Email</th>
+                <th className="px-3 py-3 text-left font-semibold">Phone</th>
+                <th className="px-3 py-3 text-left font-semibold">Role</th>
+                <th className="px-3 py-3 text-left font-semibold">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -110,23 +100,19 @@ export default function AdminUsers() {
                       idx % 2 === 0 ? 'bg-white/60' : 'bg-white/40'
                     } hover:bg-blue-50 transition`}
                   >
-                    <td className="p-3 font-medium">{user.name}</td>
-                    <td className="p-3">{user.email}</td>
-                    <td className="p-3">{user.phoneNumber || '-'}</td>
-                    <td className="p-3 capitalize font-semibold">
-                      {user.role}
-                    </td>
+                    <td className="p-3 font-medium whitespace-nowrap">{user.name}</td>
+                    <td className="p-3 whitespace-normal break-words">{user.email}</td>
+                    <td className="p-3 whitespace-normal break-words">{user.phoneNumber || '-'}</td>
+                    <td className="p-3 capitalize font-semibold whitespace-nowrap">{user.role}</td>
                     <td className="p-3 flex flex-wrap gap-2">
                       <button
                         disabled={updatingUserId === user._id}
                         onClick={() => toggleRole(user._id, user.role)}
-                        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-white text-xs font-medium shadow transition
-                          ${
-                            user.role === 'admin'
-                              ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600'
-                              : 'bg-gradient-to-r from-blue-500 to-fuchsia-500 hover:from-blue-600 hover:to-fuchsia-600'
-                          }
-                        `}
+                        className={`flex items-center gap-1 px-3 py-1.5 rounded-full text-white text-xs font-medium shadow transition ${
+                          user.role === 'admin'
+                            ? 'bg-gradient-to-r from-yellow-500 to-orange-500 hover:from-yellow-600 hover:to-orange-600'
+                            : 'bg-gradient-to-r from-blue-500 to-fuchsia-500 hover:from-blue-600 hover:to-fuchsia-600'
+                        }`}
                       >
                         {user.role === 'admin' ? (
                           <ArrowDownOnSquareIcon className="w-4 h-4" />
@@ -159,7 +145,7 @@ export default function AdminUsers() {
                 <tr>
                   <td
                     colSpan={5}
-                    className="p-6 text-center text-gray-500 bg-white/50"
+                    className="p-6 text-center text-gray-500 bg-white/50 whitespace-normal break-words"
                   >
                     No users found.
                   </td>

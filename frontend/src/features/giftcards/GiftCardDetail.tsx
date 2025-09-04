@@ -48,19 +48,18 @@ export default function GiftCardDetail() {
     navigate('/cart');
   };
 
-  // Skeleton Loader
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto p-10">
+      <div className="max-w-3xl mx-auto px-4 py-10">
         <div className="h-6 w-32 bg-gray-200 rounded animate-pulse mb-6"></div>
-        <div className="h-80 bg-gray-200 rounded-3xl animate-pulse"></div>
+        <div className="h-64 sm:h-80 bg-gray-200 rounded-3xl animate-pulse"></div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="py-16 text-center">
+      <div className="py-16 px-4 text-center">
         <p className="text-red-500 font-semibold">{error}</p>
         <button
           onClick={() => navigate(-1)}
@@ -74,12 +73,12 @@ export default function GiftCardDetail() {
 
   if (!giftCard) {
     return (
-      <div className="py-16 text-center text-gray-500">Gift card not found.</div>
+      <div className="py-16 px-4 text-center text-gray-500">Gift card not found.</div>
     );
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-6 py-16">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
       {/* Back Button */}
       <button
         onClick={() => navigate(-1)}
@@ -88,26 +87,26 @@ export default function GiftCardDetail() {
         <ArrowLeftIcon className="w-5 h-5" /> Back
       </button>
 
-      <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-50 overflow-hidden flex flex-col md:flex-row gap-10 p-8">
+      <div className="bg-white/80 backdrop-blur-md rounded-3xl shadow-xl border border-blue-50 overflow-hidden flex flex-col md:flex-row gap-8 p-6 sm:p-8">
         {/* Image */}
         <div className="flex-1 flex items-center justify-center">
           <img
             src={giftCard.imageUrl}
             alt={giftCard.brand}
-            className="h-56 w-56 object-contain bg-gray-100 p-4 rounded-2xl shadow-md ring-2 ring-blue-100"
+            className="h-48 w-48 sm:h-56 sm:w-56 object-contain bg-gray-100 p-4 rounded-2xl shadow-md ring-2 ring-blue-100"
           />
         </div>
 
         {/* Details */}
         <div className="flex-1 flex flex-col">
-          <h1 className="text-3xl font-extrabold text-slate-900 mb-2">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 mb-3">
             {giftCard.brand} Gift Card
           </h1>
           <p className="text-gray-500 mb-4">
             Perfect gift for family, friends, or yourself. Instant delivery and secure checkout.
           </p>
 
-          <div className="flex items-center gap-6 mb-4">
+          <div className="flex flex-wrap gap-6 mb-4">
             <div>
               <span className="block text-sm text-gray-500">Value</span>
               <span className="text-lg font-semibold">${giftCard.value}</span>
@@ -149,7 +148,7 @@ export default function GiftCardDetail() {
                   if (val < 1) val = 1;
                   setQuantity(val);
                 }}
-                className="border border-blue-200 rounded-lg w-20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="border border-blue-200 rounded-lg w-16 sm:w-20 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
           )}

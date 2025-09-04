@@ -41,16 +41,15 @@ export default function Register() {
   };
 
   return (
-    <div className="flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl p-8">
-        
+    <div className="flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 min-h-[80vh]">
+      <div className="w-full max-w-md bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl p-6 sm:p-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center items-center w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white shadow-lg mb-4">
             <UserPlusIcon className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Create an Account</h1>
-          <p className="text-gray-500 mt-2 text-sm">Join us to start sending and receiving gift cards instantly</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Create an Account</h1>
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">Join us to start sending and receiving gift cards instantly</p>
         </div>
 
         {/* Error */}
@@ -62,7 +61,7 @@ export default function Register() {
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-          
+
           {/* Name */}
           <div>
             <input
@@ -75,7 +74,7 @@ export default function Register() {
             />
             {errors.name && <p className="mt-1 text-xs text-red-500">{errors.name.message}</p>}
           </div>
-          
+
           {/* Email */}
           <div>
             <input
@@ -128,7 +127,7 @@ export default function Register() {
         </form>
 
         {/* Footer link */}
-        <p className="mt-6 text-sm text-gray-600 text-center">
+        <p className="mt-6 text-sm sm:text-base text-gray-600 text-center">
           Already have an account?{' '}
           <Link to="/login" className="text-blue-600 hover:text-fuchsia-600 transition font-medium">
             Login

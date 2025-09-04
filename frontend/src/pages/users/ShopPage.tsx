@@ -16,19 +16,15 @@ export default function ShopPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Pagination & filtering state
   const [page, setPage] = useState(1);
   const limit = 12;
   const [totalPages, setTotalPages] = useState(1);
 
-  // Filters & search
   const [brandFilter, setBrandFilter] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // List of all brands for filter dropdown
   const [allBrands, setAllBrands] = useState<string[]>([]);
 
-  // Fetch all brands once for dropdown
   useEffect(() => {
     api.get<GiftCard[]>('/giftcards')
       .then(res => {
@@ -38,7 +34,6 @@ export default function ShopPage() {
       .catch(() => { /* ignore */ });
   }, []);
 
-  /** Fetch cards from API */
   const fetchGiftCards = useCallback(async (pageNum: number, append = false) => {
     setLoading(true);
     setError(null);
@@ -70,13 +65,11 @@ export default function ShopPage() {
     }
   }, [brandFilter, searchTerm]);
 
-  // Reload data when filters or search change
   useEffect(() => {
     fetchGiftCards(1, false);
     setPage(1);
   }, [brandFilter, searchTerm, fetchGiftCards]);
 
-  /** Infinite scroll with window scroll */
   useEffect(() => {
     const handleScroll = () => {
       if (loading) return;
@@ -93,7 +86,7 @@ export default function ShopPage() {
   }, [loading, page, totalPages, fetchGiftCards]);
 
   return (
-    <main className="max-w-7xl mx-auto px-4 py-14">
+    <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-14">
       {/* Section Header */}
       <h1 className="relative text-4xl font-extrabold mb-10 text-center text-slate-900">
         Shop Gift Cards
@@ -125,7 +118,7 @@ export default function ShopPage() {
 
       {/* Gift Cards Grid */}
       <div
-        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8"
+        className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8"
         aria-label="Gift card results"
       >
         {giftCards.length > 0 && giftCards.map(card => (
@@ -184,7 +177,7 @@ export default function ShopPage() {
           <div
             key={i}
             className="h-60 rounded-3xl bg-gradient-to-br from-gray-200 to-gray-100 animate-pulse"
-          ></div>
+          />
         ))}
       </div>
 

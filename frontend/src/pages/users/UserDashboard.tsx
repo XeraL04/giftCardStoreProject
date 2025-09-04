@@ -5,13 +5,12 @@ import { DashboardHowItWorks } from '../../components/users/DashboardHowItWorks'
 
 
 export default function UserDashboard() {
-
   return (
-    <>
+    <main className="px-4 sm:px-6 lg:px-8">
       <DashboardHero />
       <DashboardFeaturedGiftCards />
       <DashboardCommonGiftCards />
       <DashboardHowItWorks />
-    </>
+    </main>
   );
 }

@@ -72,29 +72,29 @@ export default function AdminUserProfile() {
   if (!user) return <div className="p-8 text-center text-gray-500">User not found.</div>;
 
   return (
-    <main className="max-w-3xl mx-auto my-10 p-8 bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl">
+    <main className="max-w-lg sm:max-w-xl lg:max-w-3xl mx-auto my-10 px-4 sm:px-6 py-8 bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl">
       {/* Back button */}
       <button
         onClick={() => navigate(-1)}
-        className="flex items-center gap-2 text-blue-600 hover:text-fuchsia-500 font-medium mb-6"
+        className="inline-flex items-center gap-2 text-blue-600 hover:text-fuchsia-500 font-medium mb-6"
       >
         <ArrowLeftIcon className="w-5 h-5" /> Back to Users
       </button>
 
       {/* Header */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 flex items-center justify-center text-white shadow-lg">
+      <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 mb-8">
+        <div className="w-16 h-16 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 flex items-center justify-center text-white shadow-lg flex-shrink-0">
           <UserCircleIcon className="w-10 h-10" />
         </div>
-        <div>
-          <h1 className="text-3xl font-extrabold text-slate-900">User Profile</h1>
-          <p className="text-gray-500 text-sm">Manage user details and role</p>
+        <div className="text-center sm:text-left">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">User Profile</h1>
+          <p className="text-gray-500 text-sm sm:text-base">Manage user details and role</p>
         </div>
       </div>
 
       {/* Alerts */}
-      {error && <p className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm">{error}</p>}
-      {success && <p className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm">{success}</p>}
+      {error && <p className="mb-4 p-3 bg-red-100 text-red-700 rounded-lg text-sm text-center">{error}</p>}
+      {success && <p className="mb-4 p-3 bg-green-100 text-green-700 rounded-lg text-sm text-center">{success}</p>}
 
       {/* Profile form */}
       <div className="space-y-5">
@@ -104,7 +104,7 @@ export default function AdminUserProfile() {
           {editing ? (
             <input
               type="text"
-              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               value={name}
               onChange={e => setName(e.target.value)}
             />
@@ -119,7 +119,7 @@ export default function AdminUserProfile() {
           {editing ? (
             <input
               type="email"
-              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
@@ -134,7 +134,7 @@ export default function AdminUserProfile() {
           {editing ? (
             <input
               type="tel"
-              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               value={phoneNumber}
               onChange={e => setPhoneNumber(e.target.value)}
             />
@@ -148,7 +148,7 @@ export default function AdminUserProfile() {
           <label className="block mb-1 font-semibold text-slate-700">Role</label>
           {editing ? (
             <select
-              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400"
+              className="w-full px-4 py-2 rounded-xl border border-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 transition"
               value={role}
               onChange={e => setRole(e.target.value)}
             >
@@ -156,7 +156,13 @@ export default function AdminUserProfile() {
               <option value="admin">Admin</option>
             </select>
           ) : (
-            <span className={`px-3 py-1 rounded-full text-xs font-medium ${user.role === 'admin' ? 'bg-purple-100 text-purple-700' : 'bg-blue-100 text-blue-700'}`}>
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium ${
+                user.role === 'admin'
+                  ? 'bg-purple-100 text-purple-700'
+                  : 'bg-blue-100 text-blue-700'
+              }`}
+            >
               {user.role}
             </span>
           )}
@@ -164,18 +170,18 @@ export default function AdminUserProfile() {
       </div>
 
       {/* Actions */}
-      <div className="mt-8 flex gap-4">
+      <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-start">
         {editing ? (
           <>
             <button
               onClick={handleSave}
-              className="px-6 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow hover:shadow-lg hover:from-green-600 hover:to-emerald-600 transition"
+              className="w-full sm:w-auto px-6 py-2 rounded-full bg-gradient-to-r from-green-500 to-emerald-500 text-white font-semibold shadow hover:shadow-lg hover:from-green-600 hover:to-emerald-600 transition"
             >
               Save Changes
             </button>
             <button
               onClick={() => setEditing(false)}
-              className="px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
+              className="w-full sm:w-auto px-6 py-2 rounded-full bg-gray-200 text-gray-700 hover:bg-gray-300 transition"
             >
               Cancel
             </button>
@@ -183,7 +189,7 @@ export default function AdminUserProfile() {
         ) : (
           <button
             onClick={() => setEditing(true)}
-            className="flex items-center gap-2 px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white font-semibold shadow hover:shadow-lg hover:from-blue-600 hover:to-fuchsia-600 transition"
+            className="inline-flex items-center gap-2 px-6 py-2 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white font-semibold shadow hover:shadow-lg hover:from-blue-600 hover:to-fuchsia-600 transition"
           >
             <PencilSquareIcon className="w-4 h-4" />
             Edit Profile

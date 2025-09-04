@@ -4,23 +4,23 @@ import { FaFacebookF, FaTwitter, FaInstagram } from "react-icons/fa";
 export function Footer() {
   return (
     <footer className="bg-gradient-to-br from-blue-50 via-white to-purple-50 border-t border-blue-100 backdrop-blur-md mt-20">
-      <div className="container mx-auto px-6 py-10 max-w-7xl">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-10 max-w-7xl">
         <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-6">
           {/* Logo / Brand */}
           <div className="text-center md:text-left">
             <Link
               to="/"
-              className="text-2xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-fuchsia-500 to-purple-600"
+              className="text-2xl sm:text-3xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-blue-600 via-fuchsia-500 to-purple-600"
             >
               GiftShop
             </Link>
-            <p className="text-sm text-gray-500 mt-1">
+            <p className="text-sm sm:text-base text-gray-500 mt-1 max-w-xs md:max-w-full mx-auto md:mx-0">
               Your trusted gift card marketplace
             </p>
           </div>
 
           {/* Footer Navigation */}
-          <div className="flex flex-wrap justify-center gap-6 text-sm font-medium">
+          <nav className="flex flex-wrap justify-center md:justify-start gap-6 text-sm sm:text-base font-medium">
             <Link
               to="/contact"
               className="text-gray-600 hover:text-blue-600 transition-colors"
@@ -39,10 +39,10 @@ export function Footer() {
             >
               Privacy Policy
             </Link>
-          </div>
+          </nav>
 
           {/* Social Links */}
-          <div className="flex justify-center gap-4">
+          <div className="flex justify-center md:justify-end gap-4">
             <a
               href="#"
               aria-label="Facebook"
@@ -68,7 +68,7 @@ export function Footer() {
         </div>
 
         {/* Bottom Bar */}
-        <div className="mt-8 pt-6 border-t border-blue-100 text-center text-gray-500 text-sm">
+        <div className="mt-8 pt-6 border-t border-blue-100 text-center text-gray-500 text-xs sm:text-sm">
           &copy; {new Date().getFullYear()} GiftShop. All rights reserved.
         </div>
       </div>

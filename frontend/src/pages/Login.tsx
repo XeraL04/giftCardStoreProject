@@ -44,16 +44,15 @@ export default function Login() {
   };
 
   return (
-    <div className="flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-md bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl p-8">
-        
+    <div className="flex items-center justify-center px-4 sm:px-6 lg:px-8 py-12 min-h-[80vh]">
+      <div className="w-full max-w-md bg-white/80 backdrop-blur-md border border-blue-100 rounded-3xl shadow-xl p-6 sm:p-8">
         {/* Header */}
         <div className="text-center mb-8">
           <div className="flex justify-center items-center w-14 h-14 rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white shadow-lg mb-4">
             <ArrowRightOnRectangleIcon className="w-8 h-8" />
           </div>
-          <h1 className="text-3xl font-extrabold text-slate-900">Welcome Back</h1>
-          <p className="text-gray-500 mt-2 text-sm">Sign in to your account to continue</p>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900">Welcome Back</h1>
+          <p className="text-gray-500 mt-2 text-sm sm:text-base">Sign in to your account to continue</p>
         </div>
 
         {/* Error */}
@@ -65,7 +64,6 @@ export default function Login() {
 
         {/* Form */}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-
           {/* Email */}
           <div className="relative">
             <EnvelopeIcon className="absolute left-3 top-3.5 w-5 h-5 text-gray-400" />
@@ -107,7 +105,7 @@ export default function Login() {
         </form>
 
         {/* Footer link */}
-        <p className="mt-6 text-sm text-gray-600 text-center">
+        <p className="mt-6 text-sm sm:text-base text-gray-600 text-center">
           Don't have an account?{' '}
           <Link to="/register" className="text-blue-600 hover:text-fuchsia-600 transition font-medium">
             Register
