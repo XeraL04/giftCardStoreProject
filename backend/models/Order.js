@@ -34,7 +34,7 @@ const orderSchema = new mongoose.Schema({
 
     paymentMethod: {
         type: String,
-        enum: ['bank_transfer', 'baridimob', 'online', 'whatsapp'],
+        enum: ['whatsapp'],
         required: true
     },
     paymentStatus: {

@@ -217,18 +217,6 @@ export default function OrdersListPage() {
                   </div>
                 )}
               </div>
-
-              {/* {order.giftCard && (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    navigate(`/giftcards/${order.giftCard?._id}`);
-                  }}
-                  className="mt-2 sm:mt-0 px-4 py-2 text-xs font-semibold rounded-full bg-gradient-to-r from-blue-500 to-fuchsia-500 text-white hover:shadow-lg hover:from-blue-600 hover:to-fuchsia-600 transition"
-                >
-                  View Gift Card
-                </button>
-              )} */}
             </li>
           ))}
         </ul>

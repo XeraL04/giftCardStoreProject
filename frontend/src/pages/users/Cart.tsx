@@ -12,9 +12,7 @@ export default function Cart() {
 
   const [loading, setLoading] = useState(false);
   const [updatingItemIds, setUpdatingItemIds] = useState<string[]>([]);
-  const [paymentMethod, setPaymentMethod] = useState<
-    'bank_transfer' | 'baridimob' | 'online' | 'whatsapp' | ''
-  >('');
+  const [paymentMethod, setPaymentMethod] = useState<'whatsapp' | ''>('');
   const navigate = useNavigate();
 
   const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -34,9 +32,7 @@ export default function Cart() {
 
       clearCart();
 
-      if (paymentMethod === 'online') {
-        navigate('/checkout/success', { state: { orders: [response.data.order] } });
-      } else if (paymentMethod === 'whatsapp') {
+      if (paymentMethod === 'whatsapp') {
         if (response.data.whatsappLink) {
           window.open(response.data.whatsappLink, '_blank');
         }
@@ -156,12 +152,7 @@ export default function Cart() {
           Select Payment Method
         </h2>
         <div className="grid gap-3 max-w-md mx-auto sm:mx-0">
-          {[
-            { value: 'bank_transfer', label: 'Bank Transfer / CCP Deposit' },
-            { value: 'baridimob', label: 'BaridiMob' },
-            { value: 'whatsapp', label: 'Contact us on WhatsApp' },
-            { value: 'online', label: 'Online Payment (Coming Soon)' },
-          ].map((method) => (
+          {[{ value: 'whatsapp', label: 'Contact us on WhatsApp' }].map((method) => (
             <label
               key={method.value}
               className={`flex items-center gap-3 p-3 border rounded-xl cursor-pointer transition ${

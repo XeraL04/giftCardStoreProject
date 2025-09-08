@@ -8,7 +8,6 @@ export default function PendingPayment() {
   const {
     order,
     paymentInstructions,
-    paymentReferenceCode,
     paymentDueDate,
     whatsappLink,
   } = state || {};
@@ -30,12 +29,6 @@ export default function PendingPayment() {
       <p className="text-gray-600 mb-6 text-center">
         Thank you for your order. Please follow the instructions below to complete your payment.
       </p>
-
-      {/* Order Reference */}
-      <div className="bg-blue-50 rounded-2xl p-4 mb-6 border border-blue-100 text-center">
-        <div className="text-sm text-gray-500">Order Reference Code</div>
-        <div className="text-lg sm:text-xl font-bold text-blue-700">{paymentReferenceCode}</div>
-      </div>
 
       {/* Payment Instructions */}
       <div className="bg-gray-50 rounded-2xl p-4 mb-6 border border-gray-100">
