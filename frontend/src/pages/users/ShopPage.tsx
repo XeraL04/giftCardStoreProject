@@ -26,13 +26,20 @@ export default function ShopPage() {
   const [allBrands, setAllBrands] = useState<string[]>([]);
 
   useEffect(() => {
-    api.get<GiftCard[]>('/giftcards')
+    api.get('/giftcards')
       .then(res => {
-        const brands = Array.from(new Set(res.data.map(card => card.brand))).sort();
-        setAllBrands(brands);
+        // Try both common structures:
+        const dataArray = Array.isArray(res.data) ? res.data : res.data.giftCards;
+        if (Array.isArray(dataArray)) {
+          const brands = Array.from(new Set(dataArray.map((c: GiftCard) => c.brand))).sort();
+          setAllBrands(brands);
+        } else {
+          setAllBrands([]);
+        }
       })
-      .catch(() => { /* ignore */ });
+      .catch(() => setAllBrands([]));
   }, []);
+  
 
   const fetchGiftCards = useCallback(async (pageNum: number, append = false) => {
     setLoading(true);
