@@ -74,6 +74,16 @@ export default function OrdersListPage() {
     setCurrentPage(p);
   };
 
+  function formatPurchaseDate(dateString: string): string {
+    const d = new Date(dateString);
+    // If date is null, undefined, or epoch, show "N/A"
+    if (!dateString || d.valueOf() === 0) {
+      return "N/A";
+    }
+    // Optionally format as full date/time
+    return d.toLocaleString();
+  }
+
   return (
     <>
       <div className="max-w-6xl mx-auto mt-6 px-4 sm:px-6 lg:px-8 p-6 bg-white/80 backdrop-blur-md border border-blue-50 rounded-3xl shadow-xl">
@@ -185,17 +195,17 @@ export default function OrdersListPage() {
 
               <div className="flex-1 text-sm text-slate-700 min-w-0">
                 <div>Quantity: {order.quantity}</div>
-                <div>Purchased: {new Date(order.purchasedAt).toLocaleDateString()}</div>
+                <div>Purchased: {formatPurchaseDate(order.purchasedAt)}</div>
+                {/* <div>Purchased: {new Date(order.purchasedAt).toLocaleDateString()}</div> */}
                 <div className="mt-1">
                   Status:{' '}
                   <span
-                    className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                      order.status === 'completed'
+                    className={`px-2 py-0.5 rounded-full text-xs font-semibold ${order.status === 'completed'
                         ? 'bg-green-100 text-green-700'
                         : order.status === 'pending'
-                        ? 'bg-yellow-100 text-yellow-700'
-                        : 'bg-red-100 text-red-700'
-                    }`}
+                          ? 'bg-yellow-100 text-yellow-700'
+                          : 'bg-red-100 text-red-700'
+                      }`}
                   >
                     {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
                   </span>
@@ -227,9 +237,8 @@ export default function OrdersListPage() {
             <button
               onClick={() => goToPage(currentPage - 1)}
               disabled={currentPage === 1}
-              className={`px-3 py-1 rounded-full text-sm border ${
-                currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'
-              }`}
+              className={`px-3 py-1 rounded-full text-sm border ${currentPage === 1 ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'
+                }`}
             >
               Previous
             </button>
@@ -237,9 +246,8 @@ export default function OrdersListPage() {
               <button
                 key={page}
                 onClick={() => goToPage(page)}
-                className={`px-3 py-1 rounded-full text-sm border ${
-                  page === currentPage ? 'bg-blue-600 text-white' : 'hover:bg-blue-50'
-                }`}
+                className={`px-3 py-1 rounded-full text-sm border ${page === currentPage ? 'bg-blue-600 text-white' : 'hover:bg-blue-50'
+                  }`}
               >
                 {page}
               </button>
@@ -247,9 +255,8 @@ export default function OrdersListPage() {
             <button
               onClick={() => goToPage(currentPage + 1)}
               disabled={currentPage === totalPages}
-              className={`px-3 py-1 rounded-full text-sm border ${
-                currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'
-              }`}
+              className={`px-3 py-1 rounded-full text-sm border ${currentPage === totalPages ? 'opacity-50 cursor-not-allowed' : 'hover:bg-blue-50'
+                }`}
             >
               Next
             </button>
